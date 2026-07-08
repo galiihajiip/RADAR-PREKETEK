@@ -1,7 +1,7 @@
 import { AuthGuard } from "@/components/auth-guard";
 import { AppShell } from "@/components/shell";
 import { RoleBadge, SectionHeader } from "@/components/ui";
-import { getFullSummary } from "@/lib/reports-repo";
+import { getFullSummary, isDemoMode } from "@/lib/reports-repo";
 import {
   Activity,
   AlertOctagon,
@@ -10,6 +10,7 @@ import {
   FileText,
   Globe,
   Lock,
+  Radio,
   Server,
   Settings,
   Shield,
@@ -22,8 +23,33 @@ import Link from "next/link";
 // Live per-request data (Supabase or demo); must not be statically cached.
 export const dynamic = "force-dynamic";
 
+type AiModelInfo = {
+  model?: string;
+  version?: string;
+  status?: string;
+  classes?: string[];
+  missing_classes?: string[];
+  val_accuracy?: number | null;
+};
+
+async function fetchAiModelInfo(): Promise<AiModelInfo | null> {
+  const baseUrl = process.env.AI_SERVICE_URL;
+  if (!baseUrl) return null;
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 3000);
+    const res = await fetch(`${baseUrl}/model-info`, { signal: controller.signal, cache: "no-store" });
+    clearTimeout(timeout);
+    if (!res.ok) return null;
+    return (await res.json()) as AiModelInfo;
+  } catch {
+    return null;
+  }
+}
+
 export default async function DashboardAdminPage() {
-  const stats = await getFullSummary();
+  const [stats, demo, aiInfo] = await Promise.all([getFullSummary(), isDemoMode(), fetchAiModelInfo()]);
+  const modelLoaded = aiInfo?.status === "trained-poc";
 
   return (
     <AppShell>
@@ -33,10 +59,17 @@ export default async function DashboardAdminPage() {
             title="Admin Console"
             description="Pengaturan sistem, alat demo, dan tinjauan operasional RADAR."
           />
-          <span className="inline-flex items-center gap-2 rounded-full bg-cyan-50 px-4 py-2 text-xs font-black text-radar-cyan">
-            <Shield className="h-4 w-4" aria-hidden />
-            RADAR Demo Mode
-          </span>
+          {demo ? (
+            <span className="inline-flex items-center gap-2 rounded-full bg-cyan-50 px-4 py-2 text-xs font-black text-radar-cyan">
+              <Shield className="h-4 w-4" aria-hidden />
+              RADAR Demo Mode
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-2 rounded-full bg-green-50 px-4 py-2 text-xs font-black text-radar-green">
+              <Radio className="h-4 w-4" aria-hidden />
+              Live (Supabase)
+            </span>
+          )}
         </div>
 
         <div className="grid gap-6 lg:grid-cols-2">
@@ -58,24 +91,30 @@ export default async function DashboardAdminPage() {
                 <span className="font-bold text-radar-muted">Status</span>
                 <span className="inline-flex items-center gap-2 font-black text-radar-green">
                   <Activity className="h-3.5 w-3.5" />
-                  Demo Fallback Aktif
+                  {modelLoaded ? "Model Terlatih Aktif" : "Fallback Deterministik Aktif"}
                 </span>
               </div>
               <div className="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3 text-sm">
                 <span className="font-bold text-radar-muted">Model Version</span>
-                <span className="font-black text-radar-navy">mock-fallback-v1</span>
+                <span className="font-black text-radar-navy">{aiInfo?.version ?? "demo-fallback"}</span>
               </div>
               <div className="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3 text-sm">
-                <span className="font-bold text-radar-muted">Target Produksi</span>
-                <span className="font-black text-radar-navy">MobileNetV3-Small (lokal)</span>
+                <span className="font-bold text-radar-muted">Kelas Terlatih</span>
+                <span className="font-black text-radar-navy">{aiInfo?.classes?.join(", ") ?? "MobileNetV3-Small (target)"}</span>
               </div>
               <div className="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3 text-sm">
-                <span className="font-bold text-radar-muted">Kelas Output</span>
-                <span className="font-black text-radar-navy">4 kelas severity</span>
+                <span className="font-bold text-radar-muted">Val. Accuracy</span>
+                <span className="font-black text-radar-navy">
+                  {typeof aiInfo?.val_accuracy === "number" ? `${Math.round(aiInfo.val_accuracy * 100)}%` : "n/a"}
+                </span>
               </div>
             </div>
             <p className="mt-3 rounded-lg border border-orange-200 bg-orange-50 p-3 text-xs text-radar-orange">
-              Mode demo: prediksi menggunakan fallback deterministik. Target produksi menggunakan inferensi lokal MobileNetV3-Small.
+              {modelLoaded
+                ? `Proof-of-concept: model dilatih hanya pada kelas ${aiInfo?.classes?.join(", ") ?? "-"}${
+                    aiInfo?.missing_classes?.length ? ` (belum ada data untuk ${aiInfo.missing_classes.join(", ")})` : ""
+                  }. Belum model produksi 4-kelas 85%+ akurasi.`
+                : "AI service tidak terjangkau atau fallback dipaksa aktif — prediksi memakai fallback deterministik."}
             </p>
           </div>
 
@@ -276,12 +315,12 @@ export default async function DashboardAdminPage() {
 
         {/* Quick stats */}
         <div className="mt-6 rounded-xl border border-cyan-200 bg-cyan-50 p-4 text-sm">
-          <p className="font-black text-radar-navy">Ringkasan Sistem Demo</p>
+          <p className="font-black text-radar-navy">Ringkasan Sistem</p>
           <p className="mt-1 text-radar-muted">
             Total {stats.total.toLocaleString("id-ID")} laporan &middot;{" "}
             {stats.validated.toLocaleString("id-ID")} tervalidasi &middot;{" "}
             {stats.destroyed.toLocaleString("id-ID")} hancur total &middot;{" "}
-            Data in-memory, tidak persisten antar restart.
+            {demo ? "Data in-memory, tidak persisten antar restart." : "Data tersimpan persisten di Supabase PostgreSQL."}
           </p>
         </div>
 

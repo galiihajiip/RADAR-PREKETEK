@@ -2,14 +2,15 @@ import Link from "next/link";
 import { AuthGuard } from "@/components/auth-guard";
 import { AppShell } from "@/components/shell";
 import { MetricCard, SectionHeader } from "@/components/ui";
-import { getFullSummary } from "@/lib/reports-repo";
-import { Download, FileJson, FileSpreadsheet, Map, Shield } from "lucide-react";
+import { getFullSummary, isDemoMode } from "@/lib/reports-repo";
+import { Download, FileJson, FileSpreadsheet, Map, Radio, Shield } from "lucide-react";
 
 // Live per-request data (Supabase or demo); must not be statically cached.
 export const dynamic = "force-dynamic";
 
 export default async function DashboardAnalyticsPage() {
   const s = await getFullSummary();
+  const demo = isDemoMode();
 
   const severityRows: Array<[string, number, string]> = [
     ["Tidak Rusak", s.noDamage, "bg-radar-green"],
@@ -33,10 +34,17 @@ export default async function DashboardAnalyticsPage() {
             title="Analytics & Export"
             description="Ringkasan dampak, distribusi severity, dan jalur ekspor data terbuka."
           />
-          <span className="inline-flex items-center gap-2 rounded-full bg-cyan-50 px-4 py-2 text-xs font-black text-radar-cyan">
-            <Shield className="h-4 w-4" aria-hidden />
-            Demo Mode
-          </span>
+          {demo ? (
+            <span className="inline-flex items-center gap-2 rounded-full bg-cyan-50 px-4 py-2 text-xs font-black text-radar-cyan">
+              <Shield className="h-4 w-4" aria-hidden />
+              Demo Mode
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-2 rounded-full bg-green-50 px-4 py-2 text-xs font-black text-radar-green">
+              <Radio className="h-4 w-4" aria-hidden />
+              Live (Supabase)
+            </span>
+          )}
         </div>
 
         {/* Summary metric cards */}
@@ -165,12 +173,13 @@ export default async function DashboardAnalyticsPage() {
           </div>
         </div>
 
-        {/* Demo limitation notice */}
+        {/* Mode notice */}
         <div className="mt-6 rounded-xl border border-cyan-200 bg-cyan-50 p-4 text-sm">
-          <p className="font-black text-radar-navy">Catatan Demo</p>
+          <p className="font-black text-radar-navy">{demo ? "Catatan Demo" : "Catatan"}</p>
           <p className="mt-1 text-radar-muted">
-            Analytics menggunakan data demo in-memory. Target produksi akan terhubung ke PostgreSQL/PostGIS
-            untuk real-time analytics yang persisten.
+            {demo
+              ? "Analytics menggunakan data demo in-memory. Target produksi akan terhubung ke PostgreSQL/PostGIS untuk real-time analytics yang persisten."
+              : "Analytics terhubung langsung ke Supabase PostgreSQL/PostGIS secara real-time."}
           </p>
         </div>
 
