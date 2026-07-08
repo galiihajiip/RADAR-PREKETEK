@@ -13,6 +13,23 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const contentType = request.headers.get("content-type") ?? "";
+
+  if (contentType.includes("multipart/form-data")) {
+    const form = await request.formData();
+    const body: Record<string, unknown> = {};
+    for (const [key, value] of form.entries()) {
+      if (key !== "image" && typeof value === "string") body[key] = value;
+    }
+    const file = form.get("image");
+    const image =
+      file instanceof File && file.size > 0
+        ? { buffer: Buffer.from(await file.arrayBuffer()), contentType: file.type || "application/octet-stream" }
+        : undefined;
+    const created = await createReport(body, image);
+    return NextResponse.json({ success: true, data: created }, { status: 201 });
+  }
+
   const body = await request.json().catch(() => ({}));
   const created = await createReport(body);
   return NextResponse.json({ success: true, data: created }, { status: 201 });
