@@ -1,6 +1,6 @@
 # Dataset Preparation Report
 
-Source: `C:\Users\Hype\Downloads\UPN, MINTA SANGU KE FINAL PLS_Tahap2_FindIT2026-20260706T140814Z-3-001\UPN, MINTA SANGU KE FINAL PLS_Tahap2_FindIT2026\test_data\test`
+Source: `raw_data\test_data\test`
 
 | Class | Raw copied | Train | Val | Test |
 |---|---:|---:|---:|---:|
