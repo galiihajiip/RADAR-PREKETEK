@@ -7,6 +7,7 @@ import { Database, Menu, Phone, Radio, ShieldCheck, Wifi, WifiOff, X } from "luc
 import { RadarLogo } from "./ui";
 import { SessionPill } from "./session-pill";
 import { InstallAppPrompt } from "./install-app-prompt";
+import { ScrollReveal } from "./scroll-reveal";
 import { getDemoUser } from "@/lib/demo-auth";
 import { requireRole } from "@/lib/utils";
 import type { Role } from "@radar/shared";
@@ -166,7 +167,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </nav>
         )}
       </header>
-      <div className="mx-auto max-w-7xl px-4 py-8">{children}</div>
+      <div className="mx-auto max-w-7xl px-4 py-8" data-scroll-fade-scope>
+        {children}
+      </div>
+      <ScrollReveal />
       <InstallAppPrompt />
       <footer className="border-t border-radar-border bg-white">
         <div className="mx-auto grid max-w-7xl gap-6 px-4 py-8 text-sm text-radar-muted md:grid-cols-[1.4fr_1fr_1fr]">
