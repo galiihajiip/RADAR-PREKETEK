@@ -29,6 +29,17 @@ Pre-demo checklist: `.env` copied, `npm run dev` running, `/api/health` ok, AI `
 | 16 | AI `/model-info` | Kedaulatan data: inferensi lokal/fallback, bukan vision API eksternal. | Classes/version | Use admin page |
 | 17 | Closing | RADAR siap demo, jujur soal batasan, dan punya roadmap produksi. | Final checklist | Use final doc |
 
+## Block 4: Visual Polish & Public Emergency Portal
+
+| # | Click | Say | Judges see | Plan B |
+|---:|---|---|---|---|
+| 18 | `/` top bar | RADAR memakai tampilan portal layanan publik: status bar sistem, navigasi, dan CTA jelas. | Thin status bar (tanggal, waktu sistem, online/offline, demo mode) di atas navbar | Describe verbally |
+| 19 | Navbar mobile | Menu tetap rapi di layar kecil lewat drawer sederhana. | Hamburger menu terbuka, CTA "Laporkan Kerusakan" tetap mudah dijangkau | Resize browser to show |
+| 20 | `/` scroll | Landing menjelaskan fitur, alur laporan, dan mode demo secara jujur. | Alert banner, kartu fitur (PWA, AI, Peta, Validasi, Data Sovereignty), alur 5 langkah | Use screenshot |
+| 21 | `/report` | Form warga mobile-first dengan kartu jelas dan consent yang mudah dibaca. | Grouped form sections, offline indicator, consent card | Explain verbally |
+| 22 | `/offline` | Antrean offline menenangkan: status jelas, retry/hapus mudah dipahami. | Ringkasan pending/syncing/synced/failed, badge status berwarna, kartu gagal berbeda | Show localStorage |
+| 23 | `/dashboard/*` | Semua halaman command-center konsisten: badge demo mode, kartu, warna severity. | Consistent headers/cards di dashboard, reports, detail, analytics, admin, audit | Explain verbally |
+
 ## Key Talking Points
 
 - **AI Fallback**: Prediksi menggunakan demo-fallback-v1 deterministik. Target produksi: MobileNetV3-Small lokal.
