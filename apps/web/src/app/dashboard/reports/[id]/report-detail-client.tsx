@@ -99,6 +99,9 @@ export function ReportDetailClient({ reportId }: { reportId: string }) {
     <AppShell>
       <AuthGuard allowed={["operator", "admin"]}>
         <SectionHeader title="Detail Laporan" description="Panel validasi manusia untuk memastikan AI fallback tidak menjadi keputusan final otomatis." />
+        <div className="mb-5 rounded-2xl border border-orange-200 bg-orange-50 p-4 text-sm font-semibold leading-6 text-radar-orange">
+          AI membantu triase awal. Keputusan akhir tetap melalui validasi operator.
+        </div>
         <div className="mb-5 flex flex-wrap items-center gap-3">
           <Link className="btn-primary" href="/dashboard/reports">Kembali ke daftar</Link>
           <button className="btn-warning" onClick={load}><RotateCw className="h-4 w-4" /> Refresh</button>
@@ -141,7 +144,7 @@ export function ReportDetailClient({ reportId }: { reportId: string }) {
             </section>
 
             <section className="panel">
-              <h2 className="text-xl font-black text-radar-navy">AI Analysis</h2>
+              <h2 className="text-xl font-black text-radar-navy">Panel Analisis AI</h2>
               <div className="mt-2 flex flex-wrap items-center gap-2">
                 <SeverityBadge severity={prediction.severity} />
                 <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-radar-navy">{prediction.modelVersion}</span>
@@ -171,7 +174,7 @@ export function ReportDetailClient({ reportId }: { reportId: string }) {
 
           <aside className="grid h-fit gap-6">
             <section className="panel">
-              <h2 className="text-xl font-black text-radar-navy">Validation Panel</h2>
+              <h2 className="text-xl font-black text-radar-navy">Panel Validasi Operator</h2>
               {success && <p className="mt-3 rounded-xl bg-green-50 p-3 text-sm font-bold text-radar-green">{success}</p>}
               {actionError && <p className="mt-3 rounded-xl bg-red-50 p-3 text-sm font-bold text-radar-red">{actionError}</p>}
               <button
