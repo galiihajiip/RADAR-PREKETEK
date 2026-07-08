@@ -25,5 +25,8 @@ Thumbs.db
 *.tsbuildinfo
 dev-server.log
 dev-server.err.log
+web-dev.log
+ai-dev.log
+*.log
 package-lock.from-wrong-folder.json
 *.md
