@@ -1,26 +1,33 @@
+import { MapPinned } from "lucide-react";
+import { AppShell } from "@/components/shell";
+import { AuthGuard } from "@/components/auth-guard";
+import { SectionHeader } from "@/components/ui";
+
 type RoutePlaceholderProps = {
   route: string;
 };
 
 export function RoutePlaceholder({ route }: RoutePlaceholderProps) {
   return (
-    <main className="min-h-screen bg-radar-bg px-4 py-8 text-radar-navy sm:px-6 lg:px-8">
-      <section className="mx-auto flex min-h-[70vh] max-w-3xl flex-col justify-center">
-        <div className="rounded-lg border border-radar-border bg-white p-6 shadow-soft">
-          <p className="text-xs font-black uppercase tracking-[0.16em] text-radar-cyan">
-            RADAR PREKETEK
-          </p>
-          <h1 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">
-            Placeholder RADAR
-          </h1>
-          <p className="mt-3 text-sm font-semibold text-radar-muted">
-            Route: <span className="font-black text-radar-navy">{route}</span>
-          </p>
-          <p className="mt-4 text-sm leading-6 text-radar-muted">
-            Halaman ini disiapkan untuk MVP demo dan belum mengimplementasikan fitur lengkap.
+    <AppShell>
+      <AuthGuard allowed={["operator", "admin"]}>
+        <SectionHeader title="Peta Krisis" description="Peta geospasial sebaran laporan kerusakan." />
+        <div className="panel">
+          <span className="grid h-12 w-12 place-items-center rounded-xl bg-cyan-50 text-radar-cyan">
+            <MapPinned className="h-6 w-6" aria-hidden="true" />
+          </span>
+          <h2 className="mt-4 text-xl font-black text-radar-navy">Peta belum tersedia di demo ini</h2>
+          <p className="mt-2 max-w-2xl text-sm text-radar-muted">
+            Halaman <span className="font-mono text-radar-navy">{route}</span> disiapkan untuk MVP demo. Integrasi peta
+            interaktif (Leaflet/OpenStreetMap) direncanakan pada iterasi berikutnya sesuai roadmap di
+            <span className="font-mono"> docs/LIMITATIONS.md</span>. Untuk saat ini, gunakan{" "}
+            <a className="font-bold text-radar-blue hover:underline" href="/dashboard/reports">
+              Daftar Laporan
+            </a>{" "}
+            untuk melihat lokasi tiap laporan.
           </p>
         </div>
-      </section>
-    </main>
+      </AuthGuard>
+    </AppShell>
   );
 }
