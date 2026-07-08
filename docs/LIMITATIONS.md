@@ -10,6 +10,8 @@ RADAR PREKETEK saat ini ditargetkan sebagai MVP hackathon. Sistem dibuat untuk m
 - AI prediction dapat menggunakan fallback deterministik jika model atau service AI belum tersedia.
 - Fallback AI bukan bukti model sudah dilatih pada dataset bencana nyata.
 - Offline queue pada MVP dapat berupa simulasi visual/local browser storage, belum tentu background sync produksi.
+- Block 2 masih memakai antrean `localStorage`; Service Worker, IndexedDB, Dexie.js, dan Background Sync belum diimplementasikan.
+- Upload biner foto belum menjadi jalur produksi; form memakai path/mock preview agar alur laporan, AI fallback, dan validasi tetap bisa didemokan.
 - Autentikasi demo tidak setara dengan keamanan produksi.
 - Peta dapat menggunakan panel fallback jika map tile atau koneksi internet bermasalah.
 - Export CSV/GeoJSON ditujukan untuk demo interoperabilitas, belum mencakup semua kebutuhan operasional posko.
@@ -22,6 +24,7 @@ RADAR PREKETEK saat ini ditargetkan sebagai MVP hackathon. Sistem dibuat untuk m
 - Jika data memakai demo store, sebutkan bahwa target produksi adalah PostgreSQL/PostGIS.
 - Jika peta memakai tampilan fallback, sebutkan bahwa integrasi produksi memakai Leaflet/OpenStreetMap atau GIS lain.
 - Jika login memakai demo role, sebutkan bahwa autentikasi produksi masih roadmap.
+- Jika foto tampil sebagai aset/mock, sebutkan bahwa storage produksi dan validasi gambar masih roadmap.
 
 ## Risiko Jika Dipakai Di Luar Demo
 
