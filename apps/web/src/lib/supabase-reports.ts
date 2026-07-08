@@ -1,5 +1,6 @@
-import type { AnalyticsSummary, AuditEntry } from "@/lib/demo-data";
+import type { AnalyticsSummary, AuditEntry, ReportImageInput } from "@/lib/demo-data";
 import { fallbackPrediction } from "@/lib/ai-fallback";
+import { predictSeverity } from "@/lib/ai-service";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import type { DamageReport, ReportStatus, Severity } from "@radar/shared";
 
@@ -124,10 +125,11 @@ export async function getReportById(id: string) {
   return byId ? mapRow(byId as ReportRow) : null;
 }
 
-export async function createReport(payload: Record<string, unknown>) {
+export async function createReport(payload: Record<string, unknown>, image?: ReportImageInput) {
   const supabase = getSupabaseServerClient();
   const localId = String(payload.localId ?? payload.local_id ?? `local-${Date.now()}`);
-  const aiPrediction = fallbackPrediction({ ...payload, localId });
+  const aiPrediction =
+    (image && (await predictSeverity(image.buffer, image.contentType))) ?? fallbackPrediction({ ...payload, localId });
 
   const { data: rpcData, error: rpcError } = await supabase.rpc("create_damage_report", {
     p_local_id: localId,
@@ -154,7 +156,23 @@ export async function createReport(payload: Record<string, unknown>) {
   });
   if (aiError) throw aiError;
 
-  if (typeof payload.imagePreview === "string" && payload.imagePreview) {
+  if (image) {
+    const bucket = process.env.STORAGE_BUCKET_REPORTS || "report-images";
+    const extension = image.contentType.split("/")[1] ?? "jpg";
+    const storagePath = `${row.id}/${Date.now()}.${extension}`;
+    const { error: uploadError } = await supabase.storage
+      .from(bucket)
+      .upload(storagePath, image.buffer, { contentType: image.contentType, upsert: true });
+    if (uploadError) throw uploadError;
+
+    const { data: publicUrl } = supabase.storage.from(bucket).getPublicUrl(storagePath);
+    const { error: imageError } = await supabase.from("report_images").insert({
+      report_id: row.id,
+      storage_path: publicUrl.publicUrl,
+      content_type: image.contentType
+    });
+    if (imageError) throw imageError;
+  } else if (typeof payload.imagePreview === "string" && payload.imagePreview) {
     const { error: imageError } = await supabase.from("report_images").insert({
       report_id: row.id,
       storage_path: payload.imagePreview,
