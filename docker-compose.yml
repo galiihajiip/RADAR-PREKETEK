@@ -25,7 +25,7 @@ services:
       - "5001:5001"
     env_file: .env
     environment:
-      MODEL_PATH: /models/radar_mobilenetv3_small.ts
+      MODEL_PATH: /models/radar_mobilenetv3_small.pt
       DEMO_AI_FALLBACK: "true"
     volumes:
       - ./ml/models:/models:ro
