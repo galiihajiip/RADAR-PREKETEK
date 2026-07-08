@@ -1,9 +1,8 @@
 import generatedReports from "@/data/demo-reports.generated.json";
-import type { AiPrediction, DamageReport, ReportStatus, Severity } from "@radar/shared";
+import type { DamageReport, ReportStatus, Severity } from "@radar/shared";
+import { fallbackPrediction } from "@/lib/ai-fallback";
 
 export const reports: DamageReport[] = generatedReports as DamageReport[];
-
-const SEVERITIES: Severity[] = ["no_damage", "minor_damage", "major_damage", "destroyed"];
 
 export function summary() {
   const total = reports.length;
@@ -23,35 +22,6 @@ export function filterReports(severity?: Severity, minConfidence?: number, q?: s
   });
 }
 
-function predictionFromPayload(payload: Record<string, unknown>): AiPrediction {
-  const source = `${payload.localId ?? payload.local_id ?? ""}-${payload.address ?? ""}-${payload.description ?? ""}`;
-  const score = [...source].reduce((sum, char) => sum + char.charCodeAt(0), 0);
-  const severity = SEVERITIES[score % SEVERITIES.length];
-  const base: Record<Severity, number> = {
-    no_damage: 0.08,
-    minor_damage: 0.12,
-    major_damage: 0.18,
-    destroyed: 0.22,
-    unknown: 0
-  };
-  base[severity] = 0.62;
-  const total = SEVERITIES.reduce((sum, item) => sum + base[item], 0);
-  const probabilities = {
-    no_damage: Number((base.no_damage / total).toFixed(4)),
-    minor_damage: Number((base.minor_damage / total).toFixed(4)),
-    major_damage: Number((base.major_damage / total).toFixed(4)),
-    destroyed: Number((base.destroyed / total).toFixed(4)),
-    unknown: 0
-  };
-  return {
-    severity,
-    confidence: probabilities[severity],
-    probabilities,
-    modelVersion: "demo-fallback",
-    inferenceMs: 18 + (score % 17)
-  };
-}
-
 export function getReportById(id: string) {
   return reports.find((report) => report.id === id || report.localId === id || report.local_id === id);
 }
@@ -61,7 +31,7 @@ export function createDemoReport(payload: Record<string, unknown>) {
   const existing = reports.find((report) => report.localId === localId || report.local_id === localId);
   if (existing) return existing;
 
-  const aiPrediction = predictionFromPayload({ ...payload, localId });
+  const aiPrediction = fallbackPrediction({ ...payload, localId });
   const now = new Date().toISOString();
   const report: DamageReport = {
     id: `rpt-${Date.now()}`,
