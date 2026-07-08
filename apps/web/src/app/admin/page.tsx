@@ -6,16 +6,16 @@ export default function AdminPage() {
   return (
     <AppShell>
       <AuthGuard allowed={["admin"]}>
-      <SectionHeader title="Admin Console" description="Audit, demo credentials, escalation simulation, and operational guardrails." />
+      <SectionHeader title="Admin Console" description="Akun demo, simulasi eskalasi, dan batas operasional RADAR." />
       <div className="grid gap-4 md:grid-cols-3">
-        <div className="panel"><RoleBadge role="citizen" /><p className="mt-3 font-bold text-radar-navy">citizen@radar.demo</p><p className="mt-1 text-sm text-radar-muted">Submit reports and offline queue.</p></div>
-        <div className="panel"><RoleBadge role="operator" /><p className="mt-3 font-bold text-radar-navy">operator@radar.demo</p><p className="mt-1 text-sm text-radar-muted">Dashboard, validation, export.</p></div>
-        <div className="panel"><RoleBadge role="admin" /><p className="mt-3 font-bold text-radar-navy">admin@radar.demo</p><p className="mt-1 text-sm text-radar-muted">Escalation and audit controls.</p></div>
+        <div className="panel"><RoleBadge role="citizen" /><p className="mt-3 font-bold text-radar-navy">citizen@radar.demo</p><p className="mt-1 text-sm text-radar-muted">Membuat laporan dan mengelola antrean offline.</p></div>
+        <div className="panel"><RoleBadge role="operator" /><p className="mt-3 font-bold text-radar-navy">operator@radar.demo</p><p className="mt-1 text-sm text-radar-muted">Dashboard, validasi, peta, dan ekspor data.</p></div>
+        <div className="panel"><RoleBadge role="admin" /><p className="mt-3 font-bold text-radar-navy">admin@radar.demo</p><p className="mt-1 text-sm text-radar-muted">Kontrol eskalasi dan audit sistem.</p></div>
       </div>
-      <div className="dark-surface mt-6 rounded-2xl p-6 shadow-soft">
-        <h2 className="text-xl font-black text-white">Escalation simulation</h2>
-        <p className="mt-2 text-slate-300">Admin can simulate a high-priority notification to show operator response without depending on external realtime infrastructure.</p>
-        <button className="btn-danger mt-4">Simulate critical escalation</button>
+      <div className="mt-6 rounded-2xl border border-orange-200 bg-orange-50 p-6 shadow-sm">
+        <h2 className="text-xl font-black text-radar-navy">Simulasi Eskalasi</h2>
+        <p className="mt-2 text-sm leading-6 text-radar-muted">Admin dapat menyiapkan simulasi notifikasi prioritas tinggi tanpa bergantung pada infrastruktur realtime eksternal.</p>
+        <button className="btn-danger mt-4">Simulasikan eskalasi kritis</button>
       </div>
       </AuthGuard>
     </AppShell>
