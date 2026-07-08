@@ -1,45 +1,25 @@
 import Link from "next/link";
 import {
-  AlertTriangle,
-  ArrowRight,
-  BellRing,
+  BadgeCheck,
+  BrainCircuit,
   Database,
-  Lock,
+  Download,
   MapPinned,
+  Radio,
   ShieldCheck,
   Smartphone,
   UserCheck
 } from "lucide-react";
 import { AppShell } from "@/components/shell";
-import { MetricCard, OnlineStatusBadge, SeverityBadge } from "@/components/ui";
-import { reports, summary } from "@/lib/demo-data";
+import { LandingStatusBoard } from "@/components/landing-status-board";
 
 const FEATURES = [
-  {
-    icon: Smartphone,
-    title: "PWA Offline-First",
-    description: "Laporan tetap tersimpan di perangkat saat koneksi hilang dan otomatis disinkronkan kembali."
-  },
-  {
-    icon: ShieldCheck,
-    title: "AI Damage Assessment",
-    description: "Estimasi awal severity kerusakan membantu triase, dengan status fallback yang ditampilkan jujur."
-  },
-  {
-    icon: MapPinned,
-    title: "Peta Krisis Geospasial",
-    description: "Visualisasi sebaran laporan untuk membantu operator memprioritaskan area terdampak."
-  },
-  {
-    icon: UserCheck,
-    title: "Validasi Operator",
-    description: "Keputusan akhir tetap berada di tangan manusia melalui panel human-in-the-loop."
-  },
-  {
-    icon: Lock,
-    title: "Data Sovereignty",
-    description: "Target produksi memakai inferensi lokal dan database yang dikelola sendiri, bukan API pihak ketiga."
-  }
+  ["PWA Offline-First", "Laporan tetap tersimpan di perangkat saat jaringan bermasalah.", Smartphone],
+  ["AI Damage Assessment", "Estimasi awal severity untuk triase, bukan keputusan final.", BrainCircuit],
+  ["Peta Krisis Leaflet", "Sebaran laporan ditampilkan di peta operator.", MapPinned],
+  ["Validasi Operator", "Operator tetap menentukan keputusan akhir.", UserCheck],
+  ["Supabase Realtime", "Struktur siap menuju penyimpanan laporan persisten.", Database],
+  ["Ekspor CSV/GeoJSON", "Data bisa diuji di spreadsheet dan GIS.", Download]
 ] as const;
 
 const FLOW_STEPS = [
@@ -51,146 +31,93 @@ const FLOW_STEPS = [
 ];
 
 export default function HomePage() {
-  const data = summary();
-  const priorityReports = reports.filter((report) => report.severity === "destroyed").slice(0, 4);
-
   return (
     <AppShell>
-      <section className="grid min-h-[calc(100vh-120px)] gap-8 lg:grid-cols-[0.92fr_1.08fr] lg:items-center">
-        <div className="py-6">
-          <div className="flex flex-wrap items-center gap-3">
-            <OnlineStatusBadge online />
-            <span className="inline-flex items-center gap-2 rounded-full border border-radar-border bg-white px-3 py-1 text-xs font-black text-radar-navy">
-              <Database className="h-3.5 w-3.5 text-radar-cyan" /> 10.000 demo reports loaded
-            </span>
-          </div>
-          <h1 className="mt-6 max-w-3xl text-4xl font-black tracking-tight text-radar-navy sm:text-6xl">
-            Rapid damage intelligence for disaster response.
-          </h1>
-          <p className="mt-5 max-w-2xl text-lg leading-8 text-radar-muted">
-            RADAR menggabungkan laporan warga offline-first, klasifikasi AI lokal, dan dashboard operator untuk memprioritaskan bantuan pascabencana dengan cepat.
-          </p>
-          <div className="mt-7 flex flex-wrap gap-3">
-            <Link className="btn-primary px-5" href="/dashboard">Open command center <ArrowRight className="h-4 w-4" /></Link>
-            <Link className="btn-warning px-5" href="/report">Submit citizen report</Link>
-          </div>
-          <div className="mt-8 grid max-w-xl grid-cols-3 gap-3">
-            <div className="rounded-2xl border border-radar-border bg-white p-4">
-              <p className="text-xs font-black uppercase text-radar-muted">Reports</p>
-              <p className="mt-2 text-2xl font-black tabular text-radar-navy">{data.total.toLocaleString("id-ID")}</p>
-            </div>
-            <div className="rounded-2xl border border-radar-border bg-white p-4">
-              <p className="text-xs font-black uppercase text-radar-muted">Destroyed</p>
-              <p className="mt-2 text-2xl font-black tabular text-radar-red">{data.destroyed.toLocaleString("id-ID")}</p>
-            </div>
-            <div className="rounded-2xl border border-radar-border bg-white p-4">
-              <p className="text-xs font-black uppercase text-radar-muted">Avg AI</p>
-              <p className="mt-2 text-2xl font-black tabular text-radar-green">{Math.round(data.avgConfidence * 100)}%</p>
-            </div>
+      <section className="py-4 sm:py-4">
+        <div className="flex flex-wrap items-center justify-between gap-5">
+          <div>
+            <p className="text-sm font-bold uppercase tracking-[0.18em] text-radar-blue">RADAR PREKETEK</p>
+            <h1 className="mt-4 text-5xl font-black tracking-tight text-slate-950 sm:text-6xl">Kerusakan Saat Ini</h1>
+            <p className="mt-5 max-w-2xl text-base leading-8 text-slate-600">
+              Sistem pelaporan dan pemetaan kerusakan pascabencana untuk membantu warga, relawan, dan operator posko
+              memprioritaskan respons berdasarkan lokasi serta tingkat kerusakan.
+            </p>
           </div>
         </div>
-        <div className="relative">
-          <div className="dark-surface overflow-hidden rounded-2xl border border-white/10 p-5 shadow-soft">
-            <div className="flex items-center justify-between gap-4 border-b border-white/10 pb-4">
-              <div>
-                <p className="text-xs font-black uppercase tracking-[0.18em] text-radar-cyan">Live response board</p>
-                <h2 className="mt-1 text-2xl font-black">Gempa Cianjur</h2>
-              </div>
-              <span className="rounded-full bg-radar-red px-3 py-1 text-xs font-black">Priority</span>
-            </div>
-            <div className="mt-5 grid gap-4 lg:grid-cols-[1fr_250px]">
-              <div className="map-grid relative min-h-[360px] overflow-hidden rounded-2xl border border-white/10">
-                <div className="absolute left-[18%] top-[22%] h-24 w-24 rounded-full border border-radar-cyan/60" />
-                <div className="absolute left-[11%] top-[14%] h-40 w-40 rounded-full border border-radar-cyan/30" />
-                <div className="absolute left-[38%] top-[32%] h-56 w-56 rounded-full border border-radar-cyan/20" />
-                {priorityReports.map((report, index) => (
-                  <div
-                    key={report.id}
-                    className="absolute rounded-full border-4 border-white bg-radar-red shadow-lg"
-                    style={{ left: `${20 + index * 16}%`, top: `${20 + (index % 3) * 20}%`, width: 18, height: 18 }}
-                    title={report.address}
-                  />
-                ))}
-                <div className="absolute bottom-4 left-4 rounded-xl bg-white/95 p-3 text-radar-navy shadow-soft">
-                  <p className="text-xs font-black uppercase text-radar-muted">AI triage zone</p>
-                  <p className="mt-1 font-black">Cugenang - Pacet Corridor</p>
-                </div>
-              </div>
-              <div className="grid gap-3">
-                {priorityReports.map((report) => (
-                  <div key={report.id} className="rounded-xl border border-white/10 bg-white/10 p-3">
-                    <div className="flex items-center justify-between gap-2">
-                      <p className="text-sm font-black">{report.address.split(",")[1]?.trim() ?? "Cianjur"}</p>
-                      <SeverityBadge severity={report.severity} />
-                    </div>
-                    <p className="mt-2 line-clamp-2 text-xs text-slate-300">{report.description}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+
+        <LandingStatusBoard />
+
+        <div className="mt-10 flex flex-wrap gap-3">
+          <Link className="btn-warning px-5" href="/report">
+            Laporkan Kerusakan
+          </Link>
+          <Link className="btn-primary px-5" href="/dashboard">
+            Buka Dashboard Operator
+          </Link>
         </div>
-      </section>
-      <section className="grid gap-4 py-8 md:grid-cols-3">
-        <MetricCard label="Offline ready" value="PWA" delta="Queue survives reload" />
-        <MetricCard label="Data sovereignty" value="Local AI" delta="No third-party vision API" tone="green" />
-        <MetricCard label="Failure mode" value="Safe" delta="Supabase optional" tone="orange" />
       </section>
 
-      <section className="py-2">
-        <div className="flex items-start gap-4 rounded-2xl border border-orange-200 bg-orange-50 p-5 shadow-soft">
-          <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-radar-orange text-white">
-            <AlertTriangle className="h-5 w-5" />
+      <section className="grid gap-4 py-8 lg:grid-cols-[1fr_1fr]">
+        <div className="rounded-2xl border border-radar-border bg-white p-6 shadow-sm">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-radar-blue">Alur Utama</p>
+              <h2 className="mt-2 text-2xl font-black text-slate-950">Dari laporan warga sampai prioritas bantuan</h2>
+            </div>
+            <ShieldCheck className="h-8 w-8 text-radar-blue" />
           </div>
-          <div>
-            <h2 className="font-black text-radar-navy">Asesmen Kerusakan Pascabencana</h2>
-            <p className="mt-1 max-w-3xl text-sm text-radar-muted">
-              RADAR membantu warga melaporkan kerusakan bangunan secara cepat dan membantu operator memprioritaskan
-              respons berdasarkan tingkat keparahan. AI memberi estimasi awal, namun keputusan akhir selalu divalidasi
-              oleh operator manusia.
+          <div className="mt-6 grid gap-3 sm:grid-cols-5">
+            {FLOW_STEPS.map((step, index) => (
+              <div key={step} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                <span className="grid h-8 w-8 place-items-center rounded-full bg-blue-700 text-sm font-black text-white">
+                  {index + 1}
+                </span>
+                <p className="mt-3 text-sm font-bold leading-5 text-slate-800">{step}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-radar-border bg-white p-6 shadow-sm">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-radar-blue">Status Sistem</p>
+              <h2 className="mt-2 text-2xl font-black text-slate-950">Demo jujur, keputusan tetap manusia</h2>
+            </div>
+            <Radio className="h-8 w-8 text-radar-blue" />
+          </div>
+          <div className="mt-6 grid gap-3">
+            <p className="rounded-xl border border-cyan-200 bg-cyan-50 p-4 text-sm font-semibold leading-6 text-radar-blue">
+              AI membantu triase awal. Keputusan akhir tetap melalui validasi operator.
+            </p>
+            <p className="rounded-xl border border-orange-200 bg-orange-50 p-4 text-sm font-semibold leading-6 text-radar-orange">
+              Mode demo dapat memakai fallback deterministik dan tidak diklaim sebagai model AI produksi.
+            </p>
+            <p className="rounded-xl border border-green-200 bg-green-50 p-4 text-sm font-semibold leading-6 text-radar-green">
+              Struktur aplikasi siap untuk Supabase, peta Leaflet, export CSV/GeoJSON, dan audit trail.
             </p>
           </div>
         </div>
       </section>
 
-      <section className="py-10">
-        <h2 className="text-2xl font-black tracking-tight text-radar-navy sm:text-3xl">Fitur Utama</h2>
-        <p className="mt-2 max-w-2xl text-radar-muted">Sistem end-to-end dari laporan warga sampai keputusan operator.</p>
-        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {FEATURES.map((feature) => (
-            <div key={feature.title} className="panel">
-              <span className="grid h-10 w-10 place-items-center rounded-xl bg-cyan-50 text-radar-cyan">
-                <feature.icon className="h-5 w-5" aria-hidden="true" />
+      <section className="py-8">
+        <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.16em] text-radar-blue">Kapabilitas MVP</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950 sm:text-3xl">Layanan RADAR</h2>
+          </div>
+          <BadgeCheck className="h-8 w-8 text-radar-blue" />
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {FEATURES.map(([title, description, Icon]) => (
+            <div key={title} className="rounded-2xl border border-radar-border bg-white p-5 shadow-sm">
+              <span className="grid h-10 w-10 place-items-center rounded-xl bg-blue-50 text-radar-blue">
+                <Icon className="h-5 w-5" aria-hidden="true" />
               </span>
-              <h3 className="mt-4 font-black text-radar-navy">{feature.title}</h3>
-              <p className="mt-2 text-sm text-radar-muted">{feature.description}</p>
+              <h3 className="mt-4 font-black text-slate-950">{title}</h3>
+              <p className="mt-2 text-sm leading-6 text-slate-600">{description}</p>
             </div>
           ))}
-        </div>
-      </section>
-
-      <section className="py-10">
-        <h2 className="text-2xl font-black tracking-tight text-radar-navy sm:text-3xl">Alur Laporan</h2>
-        <div className="mt-6 grid gap-3 sm:grid-cols-5">
-          {FLOW_STEPS.map((step, index) => (
-            <div key={step} className="panel flex flex-col items-start gap-2">
-              <span className="grid h-8 w-8 place-items-center rounded-full bg-radar-navy text-sm font-black text-radar-cyan">
-                {index + 1}
-              </span>
-              <p className="text-sm font-bold text-radar-navy">{step}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="py-6">
-        <div className="flex items-start gap-4 rounded-2xl border border-cyan-200 bg-cyan-50 p-5">
-          <BellRing className="mt-0.5 h-5 w-5 shrink-0 text-radar-cyan" aria-hidden="true" />
-          <p className="text-sm text-radar-muted">
-            <strong className="text-radar-navy">RADAR Demo Mode</strong> — data dan sebagian layanan pada demo ini
-            menggunakan simulasi untuk kebutuhan MVP. Prediksi AI memakai fallback deterministik dan bukan model yang
-            sudah dilatih pada dataset bencana nyata.
-          </p>
         </div>
       </section>
     </AppShell>
