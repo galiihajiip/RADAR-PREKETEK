@@ -16,23 +16,23 @@ const roleCards: Array<{
 }> = [
   {
     role: "citizen",
-    title: "Citizen Reporter",
+    title: "Pelapor Warga",
     description: "Untuk warga atau relawan lapangan yang mengirim foto, lokasi, dan deskripsi kerusakan.",
-    features: ["Submit damage report", "Offline queue", "Manual GPS fallback"],
+    features: ["Kirim laporan kerusakan", "Antrean offline", "Fallback GPS manual"],
     icon: UserRound
   },
   {
     role: "operator",
-    title: "Command Operator",
+    title: "Operator Posko",
     description: "Untuk petugas posko yang melihat prioritas, peta, validasi AI, analytics, dan ekspor.",
-    features: ["Dashboard", "Validate AI", "GeoJSON/CSV export"],
+    features: ["Dashboard", "Validasi AI", "Ekspor GeoJSON/CSV"],
     icon: Headphones
   },
   {
     role: "admin",
-    title: "System Admin",
+    title: "Admin Sistem",
     description: "Untuk pengelola sistem yang menyiapkan role, eskalasi, dan audit demo.",
-    features: ["Admin console", "Escalation", "Audit readiness"],
+    features: ["Admin console", "Eskalasi", "Audit trail"],
     icon: ShieldCheck
   }
 ];
@@ -58,7 +58,7 @@ export default function LoginPage() {
             const user = DEMO_USERS[card.role];
             return (
               <button
-                className="panel group text-left transition hover:-translate-y-1 hover:border-radar-cyan hover:shadow-lg"
+                className="panel group text-left transition hover:border-radar-cyan hover:bg-slate-50"
                 key={card.role}
                 onClick={() => login(card.role)}
                 type="button"
@@ -72,7 +72,7 @@ export default function LoginPage() {
                 <h2 className="mt-5 text-2xl font-black text-radar-navy">{card.title}</h2>
                 <p className="mt-2 min-h-16 text-sm leading-6 text-radar-muted">{card.description}</p>
                 <div className="mt-5 rounded-2xl bg-slate-50 p-4">
-                  <p className="text-xs font-black uppercase tracking-[0.14em] text-radar-muted">Demo account</p>
+                  <p className="text-xs font-black uppercase tracking-[0.14em] text-radar-muted">Akun demo</p>
                   <p className="mt-2 font-bold text-radar-navy">{user.email}</p>
                   <p className="text-sm text-radar-muted">{user.organization}</p>
                 </div>
