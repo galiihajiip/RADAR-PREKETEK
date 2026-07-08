@@ -5,12 +5,15 @@ import { getFullSummary } from "@/lib/reports-repo";
 import {
   Activity,
   AlertOctagon,
+  ClipboardList,
   Database,
+  FileText,
   Globe,
   Lock,
   Server,
   Settings,
   Shield,
+  Siren,
   Sliders,
   Users,
 } from "lucide-react";
@@ -152,15 +155,66 @@ export default async function DashboardAdminPage() {
           </div>
         </div>
 
+        <div className="mt-6 grid gap-4 lg:grid-cols-3">
+          <div className="rounded-2xl border border-red-200 bg-red-50 p-5 shadow-sm">
+            <div className="flex items-start gap-3">
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white text-radar-red">
+                <Siren className="h-5 w-5" />
+              </span>
+              <div>
+                <h2 className="font-black text-radar-navy">Eskalasi Kritis</h2>
+                <p className="mt-1 text-sm leading-6 text-radar-muted">
+                  Live sebagai deteksi laporan hancur/confidence tinggi dan filter laporan prioritas. Notifikasi push belum diimplementasikan.
+                </p>
+                <Link className="btn-danger mt-4 w-full" href="/dashboard/reports?severity=destroyed">
+                  Buka laporan kritis
+                </Link>
+              </div>
+            </div>
+          </div>
+          <div className="rounded-2xl border border-cyan-200 bg-cyan-50 p-5 shadow-sm">
+            <div className="flex items-start gap-3">
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white text-radar-cyan">
+                <FileText className="h-5 w-5" />
+              </span>
+              <div>
+                <h2 className="font-black text-radar-navy">Audit Trail</h2>
+                <p className="mt-1 text-sm leading-6 text-radar-muted">
+                  Sudah tampil sebagai log aktivitas laporan, AI, validasi, override, reject, dan eskalasi demo.
+                </p>
+                <Link className="btn-primary mt-4 w-full" href="/dashboard/audit">
+                  Buka audit trail
+                </Link>
+              </div>
+            </div>
+          </div>
+          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div className="flex items-start gap-3">
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-slate-50 text-radar-blue">
+                <ClipboardList className="h-5 w-5" />
+              </span>
+              <div>
+                <h2 className="font-black text-radar-navy">Bedanya Admin</h2>
+                <p className="mt-1 text-sm leading-6 text-radar-muted">
+                  Admin bisa membuka console sistem dan audit. Operator fokus ke peta, daftar laporan, dan validasi.
+                </p>
+                <Link className="btn mt-4 w-full border border-radar-border bg-white text-radar-navy" href="/dashboard">
+                  Lihat command center
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Demo Tools */}
-        <div className="mt-6 dark-surface rounded-2xl p-6 shadow-soft">
+        <div className="mt-6 rounded-2xl border border-radar-border bg-white p-6 shadow-sm">
           <div className="flex items-start gap-4">
-            <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white/10">
+            <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-cyan-50">
               <Settings className="h-5 w-5 text-radar-cyan" />
             </div>
             <div>
-              <h2 className="text-xl font-black text-white">Alat Demo</h2>
-              <p className="mt-1 text-sm text-slate-300">
+              <h2 className="text-xl font-black text-radar-navy">Alat Demo</h2>
+              <p className="mt-1 text-sm text-radar-muted">
                 Simulasi dan pengaturan khusus untuk kebutuhan presentasi MVP.
               </p>
             </div>
@@ -172,7 +226,7 @@ export default async function DashboardAdminPage() {
               aria-label="Simulasi laporan hancur (belum tersedia)"
             >
               <AlertOctagon className="h-4 w-4" />
-              Simulasi Laporan Hancur
+              Simulasi Push Eskalasi
               <span className="ml-1 rounded bg-white/20 px-2 py-0.5 text-[10px] font-bold">PLANNED</span>
             </button>
             <button
@@ -185,8 +239,8 @@ export default async function DashboardAdminPage() {
               <span className="ml-1 rounded bg-white/20 px-2 py-0.5 text-[10px] font-bold">PLANNED</span>
             </button>
           </div>
-          <p className="mt-3 text-xs text-slate-400">
-            Tombol di atas disiapkan sebagai placeholder untuk alat demo. Fitur simulasi eskalasi dan reset seed belum diimplementasikan di MVP ini.
+          <p className="mt-3 text-xs text-radar-muted">
+            Tombol di atas disiapkan sebagai placeholder untuk alat demo. Deteksi laporan kritis dan audit trail sudah ada; simulasi push eskalasi dan reset seed belum diimplementasikan di MVP ini.
           </p>
         </div>
 
