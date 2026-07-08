@@ -1,13 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import Link from "next/link";
+import { FormEvent, useState } from "react";
 import { Camera, CheckCircle2, LocateFixed, Send, WifiOff } from "lucide-react";
 import { AuthGuard } from "@/components/auth-guard";
 import { AppShell } from "@/components/shell";
 import { OnlineStatusBadge, SectionHeader } from "@/components/ui";
+import { createReport, type ReportPayload } from "@/lib/api-client";
+import { enqueueReport } from "@/lib/offline-queue";
+import type { DamageReport } from "@radar/shared";
 
 export default function ReportPage() {
   const [queued, setQueued] = useState(false);
+  const [created, setCreated] = useState<DamageReport | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
   const [lat, setLat] = useState("-6.816");
   const [lng, setLng] = useState("107.079");
   const [isLocating, setIsLocating] = useState(false);
@@ -34,10 +41,67 @@ export default function ReportPage() {
     );
   }
 
-  function submit(formData: FormData) {
-    const payload = Object.fromEntries(formData.entries());
-    localStorage.setItem("radar-last-report", JSON.stringify({ ...payload, localId: `local-${Date.now()}`, status: "offline_queued" }));
-    setQueued(true);
+  function payloadFromForm(form: HTMLFormElement): ReportPayload {
+    const formData = new FormData(form);
+    const image = formData.get("image");
+    const localId = `local-${Date.now()}`;
+    return {
+      localId,
+      local_id: localId,
+      reporterName: String(formData.get("reporterName") ?? ""),
+      address: String(formData.get("address") ?? ""),
+      description: String(formData.get("description") ?? ""),
+      latitude: String(formData.get("latitude") ?? lat),
+      longitude: String(formData.get("longitude") ?? lng),
+      imagePreview: image instanceof File && image.name ? `mock://${image.name}` : "/radar-mark.svg",
+      imageContentType: image instanceof File && image.type ? image.type : "image/mock"
+    };
+  }
+
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const payload = payloadFromForm(event.currentTarget);
+    setIsSubmitting(true);
+    setSubmitError("");
+    setQueued(false);
+    try {
+      if (!navigator.onLine) throw new Error("Perangkat offline. Laporan disimpan ke antrean lokal.");
+      const report = await createReport(payload);
+      setCreated(report);
+    } catch (error) {
+      const item = enqueueReport(payload);
+      localStorage.setItem("radar-last-report", JSON.stringify({ ...payload, localId: item.local_id, status: "offline_queued" }));
+      setQueued(true);
+      setSubmitError(error instanceof Error ? error.message : "API gagal. Laporan disimpan ke antrean lokal.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  if (created) {
+    return (
+      <AppShell>
+        <AuthGuard allowed={["citizen", "operator", "admin"]}>
+          <div className="panel mx-auto max-w-3xl">
+            <CheckCircle2 className="h-10 w-10 text-radar-green" />
+            <h1 className="mt-4 text-3xl font-black text-radar-navy">Laporan berhasil dibuat</h1>
+            <p className="mt-2 text-radar-muted">
+              Laporan masuk melalui API demo RADAR dan diproses dengan AI fallback lokal.
+            </p>
+            <div className="mt-5 grid gap-3 rounded-2xl bg-slate-50 p-4 text-sm">
+              <p><span className="font-black">ID:</span> {created.id}</p>
+              <p><span className="font-black">Status:</span> {created.status}</p>
+              <p><span className="font-black">Prediksi AI:</span> {created.aiPrediction?.severity ?? created.severity} ({Math.round((created.aiPrediction?.confidence ?? created.confidence) * 100)}%)</p>
+              <p className="text-radar-muted">Catatan: upload biner foto belum aktif di Block 2; bukti foto memakai path/mock preview untuk menjaga demo tetap berjalan.</p>
+            </div>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Link className="btn-primary" href={`/dashboard/reports/${created.id}`}>Buka detail laporan</Link>
+              <button className="btn-warning" onClick={() => setCreated(null)}>Buat laporan lagi</button>
+            </div>
+          </div>
+        </AuthGuard>
+      </AppShell>
+    );
   }
 
   return (
@@ -45,7 +109,7 @@ export default function ReportPage() {
       <AuthGuard allowed={["citizen", "operator", "admin"]}>
       <SectionHeader title="Laporan Warga" description="Form besar dan ringkas untuk kondisi darurat. Jika offline, laporan masuk queue dan disinkronkan saat jaringan kembali." />
       <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
-        <form action={submit} className="panel grid gap-5">
+        <form onSubmit={submit} className="panel grid gap-5">
           <div className="rounded-2xl bg-radar-navy p-5 text-white">
             <p className="text-xs font-black uppercase tracking-[0.16em] text-radar-cyan">Citizen intake</p>
             <h2 className="mt-2 text-2xl font-black">Laporkan kondisi bangunan</h2>
@@ -78,14 +142,17 @@ export default function ReportPage() {
             </span>
           </label>
           <label className="flex items-start gap-3 rounded-xl bg-slate-50 p-3 text-sm"><input name="consent" required type="checkbox" defaultChecked className="mt-1" /> Saya setuju foto dan lokasi digunakan untuk respons bencana.</label>
-          <button className="btn-primary w-full" type="submit"><Send className="h-4 w-4" /> Kirim laporan</button>
+          {submitError && <p className="rounded-xl bg-orange-50 p-3 text-sm font-bold text-radar-orange">{submitError}</p>}
+          <button className="btn-primary w-full" type="submit" disabled={isSubmitting}>
+            <Send className="h-4 w-4" /> {isSubmitting ? "Mengirim..." : "Kirim laporan"}
+          </button>
         </form>
         <aside className="grid h-fit gap-4">
         <div className="panel">
           <OnlineStatusBadge online={!queued} />
           <h2 className="mt-4 text-lg font-black text-radar-navy">{queued ? "Laporan masuk queue" : "Siap dikirim"}</h2>
           <p className="mt-2 text-sm text-radar-muted">
-            {queued ? "Buka /offline untuk melihat status. Saat online, API demo menerima laporan dan AI fallback memberi status ai_pending bila layanan mati." : "Matikan Network di DevTools untuk memperagakan offline-first."}
+            {queued ? "Buka /offline untuk melihat status antrean dan sinkronisasi ulang." : "Online submit akan masuk API demo. Matikan Network di DevTools untuk memperagakan offline-first."}
           </p>
         </div>
         <div className="panel grid gap-3">
