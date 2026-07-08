@@ -20,13 +20,14 @@ RADAR PREKETEK saat ini ditargetkan sebagai MVP hackathon. Sistem dibuat untuk m
 - Dashboard command center menggunakan data in-memory, tidak real-time.
 - Analytics menggunakan kalkulasi sisi server dari data demo, bukan agregasi database.
 - Tombol demo tools (simulasi hancur, reset seed) masih placeholder di MVP.
-- Leaflet, Supabase, PostGIS, Push Notification, dan Service Worker belum diimplementasikan di Block 3.
+- Peta krisis (`/dashboard/map`) sudah memakai Leaflet + tile OpenStreetMap dengan data demo in-memory, tapi belum ada clustering, layer PostGIS, atau filter status/tanggal penuh.
+- Supabase, PostGIS runtime, Push Notification, dan Service Worker belum diimplementasikan.
 
 ## Yang Harus Dijelaskan Saat Demo
 
 - Jika AI fallback aktif, sebutkan bahwa prediksi adalah fallback demo.
 - Jika data memakai demo store, sebutkan bahwa target produksi adalah PostgreSQL/PostGIS.
-- Jika peta memakai tampilan fallback, sebutkan bahwa integrasi produksi memakai Leaflet/OpenStreetMap atau GIS lain.
+- Peta memakai Leaflet/OpenStreetMap dengan data demo in-memory; sebutkan bahwa produksi menambahkan clustering dan layer PostGIS.
 - Jika login memakai demo role, sebutkan bahwa autentikasi produksi masih roadmap.
 - Jika foto tampil sebagai aset/mock, sebutkan bahwa storage produksi dan validasi gambar masih roadmap.
 - Dashboard analytics adalah kalkulasi dari data demo in-memory, bukan real-time analytics.
@@ -50,4 +51,4 @@ RADAR PREKETEK saat ini ditargetkan sebagai MVP hackathon. Sistem dibuat untuk m
 - Pengujian aksesibilitas, performa, dan keamanan.
 - Audit log persisten dengan tabel terpisah.
 - Demo tools fungsional (simulasi hancur, reset seed).
-- Leaflet/OpenStreetMap terintegrasi penuh.
+- Clustering dan layer PostGIS penuh di peta krisis.
