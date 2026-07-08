@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@radar/shared": "file:../../packages/shared",
+    "@supabase/supabase-js": "^2.45.4",
     "@vitejs/plugin-react": "^4.3.1",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.468.0",

@@ -20,14 +20,19 @@
     "test": "npm --workspace apps/web run test",
     "test:ai": "cd apps/ai-service && python -m pytest -q",
     "test:all": "npm run lint && npm run typecheck && npm run test && npm run test:ai",
-    "db:migrate": "node -e \"console.log('Run database/migrations in numeric order in Supabase SQL editor or Postgres.')\"",
-    "db:seed": "node -e \"console.log('Run database/seed/0001_demo_seed.sql after migrations.')\"",
+    "db:migrate": "node scripts/db/run-sql.mjs database/migrations",
+    "db:seed": "node scripts/db/run-sql.mjs database/seed",
+    "db:storage": "node scripts/db/ensure-storage-bucket.mjs",
     "data:generate": "python ml/scripts/generate_dummy_data.py --reports 10000 --images-per-class 2500",
     "ml:prepare": "python ml/scripts/prepare_dataset.py",
     "ml:train": "python ml/scripts/train.py",
     "ml:evaluate": "python ml/scripts/evaluate.py"
   },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.4"
+  },
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "concurrently": "^8.2.2",
+    "pg": "^8.13.0"
   }
 }
