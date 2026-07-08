@@ -136,12 +136,15 @@ export default function ReportPage() {
           </div>
           <label className="grid gap-2 text-sm font-bold">
             Foto kerusakan
-            <span className="flex min-h-28 items-center justify-center gap-3 rounded-2xl border border-dashed border-radar-cyan bg-cyan-50/60 p-4 text-radar-blue">
-              <Camera className="h-5 w-5" /> Upload image
-              <input name="image" type="file" accept="image/*" className="sr-only" />
+            <span className="flex min-h-28 items-center justify-center gap-3 rounded-2xl border border-dashed border-radar-cyan bg-cyan-50/60 p-4 text-center text-radar-blue">
+              <Camera className="h-5 w-5" aria-hidden="true" /> Ambil atau unggah foto kerusakan
+              <input name="image" type="file" accept="image/*" className="sr-only" aria-label="Unggah foto kerusakan" />
             </span>
           </label>
-          <label className="flex items-start gap-3 rounded-xl bg-slate-50 p-3 text-sm"><input name="consent" required type="checkbox" defaultChecked className="mt-1" /> Saya setuju foto dan lokasi digunakan untuk respons bencana.</label>
+          <label className="flex items-start gap-3 rounded-xl border border-radar-border bg-slate-50 p-4 text-sm leading-relaxed">
+            <input name="consent" required type="checkbox" defaultChecked className="mt-1 h-4 w-4" />
+            Saya setuju foto, lokasi, dan deskripsi kerusakan digunakan tim respons bencana untuk keperluan asesmen dan bantuan.
+          </label>
           {submitError && <p className="rounded-xl bg-orange-50 p-3 text-sm font-bold text-radar-orange">{submitError}</p>}
           <button className="btn-primary w-full" type="submit" disabled={isSubmitting}>
             <Send className="h-4 w-4" /> {isSubmitting ? "Mengirim..." : "Kirim laporan"}
