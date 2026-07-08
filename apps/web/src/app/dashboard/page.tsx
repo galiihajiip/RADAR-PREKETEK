@@ -33,7 +33,7 @@ export default async function DashboardPage() {
 
         {/* Critical escalation banner */}
         {hasCritical && (
-          <div className="mb-6 flex items-start gap-4 rounded-2xl border border-red-200 bg-red-50 p-5 shadow-soft">
+          <div className="mb-6 flex items-start gap-4 rounded-2xl border border-red-200 bg-red-50 p-5 shadow-sm">
             <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-radar-red text-white">
               <AlertTriangle className="h-5 w-5" />
             </div>
@@ -160,7 +160,7 @@ export default async function DashboardPage() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="panel flex items-center gap-4 transition hover:border-radar-cyan hover:shadow-lg"
+                  className="panel flex items-center gap-4 transition hover:border-radar-cyan hover:bg-slate-50"
                 >
                   <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-cyan-50">
                     <item.icon className="h-5 w-5 text-radar-cyan" />
