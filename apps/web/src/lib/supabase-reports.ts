@@ -263,9 +263,43 @@ export async function fullSummary(): Promise<AnalyticsSummary> {
   };
 }
 
-// Audit log is a UI/demo affordance derived from event timestamps rather
-// than a persisted table; the Supabase-backed path returns an empty log
-// until a real audit trail (backed by validation_reviews) is wired up.
+const ACTION_LABELS: Record<string, string> = {
+  report_created: "Laporan Dibuat",
+  ai_completed: "AI Selesai",
+  validated: "Tervalidasi",
+  overridden: "Override Severity",
+  rejected: "Ditolak",
+  escalated: "Eskalasi"
+};
+
+type AuditRow = {
+  id: string;
+  action: string;
+  actor: string;
+  role: string;
+  report_id: string;
+  report_title: string;
+  ts: string;
+  note: string | null;
+};
+
+// Merges report creation, AI prediction, and validation_reviews history into
+// one timeline via the report_audit_log() RPC (single round trip, sorted and
+// capped in SQL) instead of pulling three tables down and merging in JS.
 export async function generateAuditLog(): Promise<AuditEntry[]> {
-  return [];
+  const supabase = getSupabaseServerClient();
+  const { data, error } = await supabase.rpc("report_audit_log", { p_limit: 150 });
+  if (error) throw error;
+
+  return (data as AuditRow[]).map((row) => ({
+    id: row.id,
+    action: row.action,
+    actionLabel: ACTION_LABELS[row.action] ?? row.action,
+    actor: row.actor,
+    role: row.role,
+    reportId: row.report_id,
+    reportTitle: row.report_title,
+    timestamp: row.ts,
+    note: row.note ?? undefined
+  }));
 }
