@@ -9,24 +9,24 @@ export const dynamic = "force-dynamic";
 export default async function AnalyticsPage() {
   const data = await getFullSummary();
   const rows = [
-    ["No damage", data.noDamage, "bg-radar-green"],
-    ["Minor", data.minorDamage, "bg-radar-yellow"],
-    ["Major", data.majorDamage, "bg-radar-orange"],
-    ["Destroyed", data.destroyed, "bg-radar-red"]
+    ["Tidak Rusak", data.noDamage, "bg-radar-green"],
+    ["Rusak Ringan", data.minorDamage, "bg-radar-yellow"],
+    ["Rusak Berat", data.majorDamage, "bg-radar-orange"],
+    ["Hancur Total", data.destroyed, "bg-radar-red"]
   ] as const;
   return (
     <AppShell>
       <AuthGuard allowed={["operator", "admin"]}>
       <SectionHeader title="Analytics & Export" description="Ringkasan dampak untuk posko dan jalur ekspor terbuka." />
       <div className="grid gap-4 md:grid-cols-4">
-        <MetricCard label="Total" value={data.total} />
-        <MetricCard label="Destroyed" value={data.destroyed} tone="red" />
-        <MetricCard label="Validated" value={data.validated} tone="green" />
-        <MetricCard label="Avg confidence" value={`${Math.round(data.avgConfidence * 100)}%`} />
+        <MetricCard label="Total Laporan" value={data.total} />
+        <MetricCard label="Hancur Total" value={data.destroyed} tone="red" />
+        <MetricCard label="Tervalidasi" value={data.validated} tone="green" />
+        <MetricCard label="Rata-rata AI" value={`${Math.round(data.avgConfidence * 100)}%`} />
       </div>
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_360px]">
         <div className="panel">
-          <h2 className="text-xl font-black text-radar-navy">Severity distribution</h2>
+          <h2 className="text-xl font-black text-radar-navy">Distribusi Severity</h2>
           <div className="mt-5 grid gap-4">
             {rows.map(([label, value, color]) => (
               <div key={label}>
@@ -42,8 +42,8 @@ export default async function AnalyticsPage() {
           </div>
         </div>
         <div className="panel">
-          <h2 className="text-xl font-black text-radar-navy">Exports</h2>
-          <p className="mt-2 text-sm text-radar-muted">Data dummy 10.000 baris siap diuji di GIS atau spreadsheet.</p>
+          <h2 className="text-xl font-black text-radar-navy">Ekspor Data</h2>
+          <p className="mt-2 text-sm text-radar-muted">Data laporan siap diuji di GIS, spreadsheet, atau sistem respons lain.</p>
           <div className="mt-5 grid gap-3">
             <a className="btn-primary" href="/api/export/geojson">Export GeoJSON</a>
             <a className="btn-warning" href="/api/export/csv">Export CSV</a>
