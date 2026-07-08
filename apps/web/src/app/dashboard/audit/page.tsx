@@ -112,7 +112,7 @@ export default async function DashboardAuditPage() {
         </div>
 
         {/* Desktop table view */}
-        <div className="hidden overflow-hidden rounded-2xl border border-radar-border bg-white shadow-soft lg:block">
+        <div className="hidden overflow-hidden rounded-2xl border border-radar-border bg-white shadow-sm lg:block">
           <table className="w-full text-left text-sm">
             <thead className="bg-slate-50 text-xs uppercase tracking-[0.12em] text-radar-muted">
               <tr>
