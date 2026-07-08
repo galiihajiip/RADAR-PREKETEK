@@ -79,7 +79,7 @@ export default function DashboardReportsPage() {
 
         {!loading && !error && reports.length > 0 && (
           <>
-            <div className="hidden overflow-hidden rounded-2xl border border-radar-border bg-white shadow-soft lg:block">
+            <div className="hidden overflow-hidden rounded-2xl border border-radar-border bg-white shadow-sm lg:block">
               <table className="w-full text-left text-sm">
                 <thead className="bg-slate-50 text-xs uppercase tracking-[0.12em] text-radar-muted">
                   <tr>
@@ -93,7 +93,7 @@ export default function DashboardReportsPage() {
                 </thead>
                 <tbody>
                   {reports.map((report) => (
-                    <tr key={report.id} className="border-t border-radar-border">
+                    <tr key={report.id} className="border-t border-radar-border transition hover:bg-slate-50">
                       <td className="px-4 py-4">
                         <p className="font-black text-radar-navy">{report.address}</p>
                         <p className="line-clamp-1 text-radar-muted">{report.description}</p>
