@@ -16,7 +16,6 @@ type FlaskPredictResponse = {
 // placeholder instead of failing the whole report submission.
 export async function predictSeverity(imageBuffer: Buffer, contentType: string): Promise<AiPrediction | null> {
   const baseUrl = process.env.AI_SERVICE_URL;
-  console.error("[predictSeverity] baseUrl=", baseUrl, "bufLen=", imageBuffer.length, "contentType=", contentType);
   if (!baseUrl) return null;
 
   const form = new FormData();
@@ -39,8 +38,7 @@ export async function predictSeverity(imageBuffer: Buffer, contentType: string):
       modelVersion: json.data.model_version,
       inferenceMs: json.data.inference_ms
     };
-  } catch (err) {
-    console.error("[predictSeverity] error:", err);
+  } catch {
     return null;
   }
 }
