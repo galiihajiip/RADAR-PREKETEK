@@ -11,7 +11,7 @@ projector, DevTools Network tab ready to demo offline, exports pre-tested once.
 > bangunan pascabencana. Warga melapor lewat browser, AI memberi estimasi awal, dan operator memvalidasi
 > sebelum bantuan diprioritaskan."
 
-Screen: `/` — point at the alert banner and the 5-step flow section.
+Screen: `/` — point at the BMKG-like public portal layout, alert banner, damage status cards, and 5-step flow section.
 
 ## Citizen Flow (60s)
 
