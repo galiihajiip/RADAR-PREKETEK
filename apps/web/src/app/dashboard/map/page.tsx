@@ -1,11 +1,13 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { Shield } from "lucide-react";
 import { AuthGuard } from "@/components/auth-guard";
 import { AppShell } from "@/components/shell";
 import { EmptyState, LoadingState, SectionHeader } from "@/components/ui";
-import { reports } from "@/lib/demo-data";
+import { getReports } from "@/lib/api-client";
+import type { DamageReport } from "@radar/shared";
 
 const MapClient = dynamic(() => import("./map-client").then((mod) => mod.MapClient), {
   ssr: false,
@@ -13,6 +15,18 @@ const MapClient = dynamic(() => import("./map-client").then((mod) => mod.MapClie
 });
 
 export default function DashboardMapPage() {
+  const [reports, setReports] = useState<DamageReport[] | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    getReports().then((data) => {
+      if (!cancelled) setReports(data);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   return (
     <AppShell>
       <AuthGuard allowed={["operator", "admin"]}>
@@ -24,7 +38,9 @@ export default function DashboardMapPage() {
           </span>
         </div>
 
-        {reports.length === 0 ? (
+        {reports === null ? (
+          <LoadingState />
+        ) : reports.length === 0 ? (
           <EmptyState title="Belum ada laporan" description="Buat laporan demo dari halaman Lapor Kerusakan untuk melihat titik di peta." />
         ) : (
           <MapClient reports={reports} />
