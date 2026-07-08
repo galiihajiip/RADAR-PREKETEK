@@ -1,37 +1,138 @@
 {
   "model": "MobileNetV3-Small",
-  "status": "dataset-indexed-demo-fallback",
+  "status": "trained-poc",
+  "model_version": "poc-v1-1783505084",
+  "pretrained_backbone": true,
   "classes": [
-    "no_damage",
-    "minor_damage",
+    "destroyed",
     "major_damage",
-    "destroyed"
+    "minor_damage",
+    "no_damage"
   ],
-  "available_train_classes": [
+  "num_classes": 4,
+  "missing_classes": [
     "no_damage",
-    "minor_damage",
-    "major_damage",
-    "destroyed"
+    "major_damage"
   ],
   "counts": {
     "train": {
-      "no_damage": 1750,
-      "minor_damage": 1802,
-      "major_damage": 1750,
-      "destroyed": 1755
+      "no_damage": 0,
+      "minor_damage": 52,
+      "major_damage": 0,
+      "destroyed": 5
     },
     "val": {
-      "no_damage": 375,
-      "minor_damage": 386,
-      "major_damage": 375,
-      "destroyed": 376
+      "no_damage": 0,
+      "minor_damage": 11,
+      "major_damage": 0,
+      "destroyed": 1
     },
     "test": {
-      "no_damage": 375,
-      "minor_damage": 387,
-      "major_damage": 375,
-      "destroyed": 377
+      "no_damage": 0,
+      "minor_damage": 12,
+      "major_damage": 0,
+      "destroyed": 2
     }
   },
-  "note": "Install torch/torchvision and add all four class folders before production training."
+  "epochs": 15,
+  "train_history": [
+    {
+      "epoch": 1,
+      "loss": 0.5404007894951001,
+      "train_acc": 0.8245614035087719
+    },
+    {
+      "epoch": 2,
+      "loss": 0.17001604850877794,
+      "train_acc": 0.9473684210526315
+    },
+    {
+      "epoch": 3,
+      "loss": 0.3255369422728555,
+      "train_acc": 0.8596491228070176
+    },
+    {
+      "epoch": 4,
+      "loss": 0.03528969120561031,
+      "train_acc": 1.0
+    },
+    {
+      "epoch": 5,
+      "loss": 0.09168524412732375,
+      "train_acc": 0.9473684210526315
+    },
+    {
+      "epoch": 6,
+      "loss": 0.060732157394420686,
+      "train_acc": 1.0
+    },
+    {
+      "epoch": 7,
+      "loss": 0.18929962805684722,
+      "train_acc": 0.9122807017543859
+    },
+    {
+      "epoch": 8,
+      "loss": 0.13861747423448323,
+      "train_acc": 0.9824561403508771
+    },
+    {
+      "epoch": 9,
+      "loss": 0.11471104368632823,
+      "train_acc": 0.9824561403508771
+    },
+    {
+      "epoch": 10,
+      "loss": 0.06618790299092468,
+      "train_acc": 0.9824561403508771
+    },
+    {
+      "epoch": 11,
+      "loss": 0.06881135313265156,
+      "train_acc": 0.9824561403508771
+    },
+    {
+      "epoch": 12,
+      "loss": 0.15005130768475824,
+      "train_acc": 0.9298245614035088
+    },
+    {
+      "epoch": 13,
+      "loss": 0.24524076609757908,
+      "train_acc": 0.9122807017543859
+    },
+    {
+      "epoch": 14,
+      "loss": 0.04921652924620726,
+      "train_acc": 1.0
+    },
+    {
+      "epoch": 15,
+      "loss": 0.4519747214293794,
+      "train_acc": 0.7719298245614035
+    }
+  ],
+  "val_accuracy": 1.0,
+  "val_per_class": {
+    "destroyed": {
+      "correct": 1,
+      "total": 1
+    },
+    "major_damage": {
+      "correct": 0,
+      "total": 0
+    },
+    "minor_damage": {
+      "correct": 11,
+      "total": 11
+    },
+    "no_damage": {
+      "correct": 0,
+      "total": 0
+    }
+  },
+  "weights_path": "ml\\models\\radar_mobilenetv3_small.pt",
+  "weights_size_mb": 5.93,
+  "measured_inference_ms": 46.23,
+  "note": "Proof-of-concept only: trained on a small, incomplete dataset (missing classes: ['no_damage', 'major_damage']). Not the production 4-class, 85%+-accuracy model described in the proposal - needs a full labeled dataset (e.g. xBD) before production use."
 }
