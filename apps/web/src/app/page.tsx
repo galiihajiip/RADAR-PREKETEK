@@ -1,8 +1,54 @@
 import Link from "next/link";
-import { ArrowRight, Database } from "lucide-react";
+import {
+  AlertTriangle,
+  ArrowRight,
+  BellRing,
+  Database,
+  Lock,
+  MapPinned,
+  ShieldCheck,
+  Smartphone,
+  UserCheck
+} from "lucide-react";
 import { AppShell } from "@/components/shell";
 import { MetricCard, OnlineStatusBadge, SeverityBadge } from "@/components/ui";
 import { reports, summary } from "@/lib/demo-data";
+
+const FEATURES = [
+  {
+    icon: Smartphone,
+    title: "PWA Offline-First",
+    description: "Laporan tetap tersimpan di perangkat saat koneksi hilang dan otomatis disinkronkan kembali."
+  },
+  {
+    icon: ShieldCheck,
+    title: "AI Damage Assessment",
+    description: "Estimasi awal severity kerusakan membantu triase, dengan status fallback yang ditampilkan jujur."
+  },
+  {
+    icon: MapPinned,
+    title: "Peta Krisis Geospasial",
+    description: "Visualisasi sebaran laporan untuk membantu operator memprioritaskan area terdampak."
+  },
+  {
+    icon: UserCheck,
+    title: "Validasi Operator",
+    description: "Keputusan akhir tetap berada di tangan manusia melalui panel human-in-the-loop."
+  },
+  {
+    icon: Lock,
+    title: "Data Sovereignty",
+    description: "Target produksi memakai inferensi lokal dan database yang dikelola sendiri, bukan API pihak ketiga."
+  }
+] as const;
+
+const FLOW_STEPS = [
+  "Warga lapor",
+  "Foto/GPS tersimpan",
+  "AI memberi estimasi",
+  "Operator validasi",
+  "Bantuan diprioritaskan"
+];
 
 export default function HomePage() {
   const data = summary();
@@ -89,6 +135,63 @@ export default function HomePage() {
         <MetricCard label="Offline ready" value="PWA" delta="Queue survives reload" />
         <MetricCard label="Data sovereignty" value="Local AI" delta="No third-party vision API" tone="green" />
         <MetricCard label="Failure mode" value="Safe" delta="Supabase optional" tone="orange" />
+      </section>
+
+      <section className="py-2">
+        <div className="flex items-start gap-4 rounded-2xl border border-orange-200 bg-orange-50 p-5 shadow-soft">
+          <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-radar-orange text-white">
+            <AlertTriangle className="h-5 w-5" />
+          </div>
+          <div>
+            <h2 className="font-black text-radar-navy">Asesmen Kerusakan Pascabencana</h2>
+            <p className="mt-1 max-w-3xl text-sm text-radar-muted">
+              RADAR membantu warga melaporkan kerusakan bangunan secara cepat dan membantu operator memprioritaskan
+              respons berdasarkan tingkat keparahan. AI memberi estimasi awal, namun keputusan akhir selalu divalidasi
+              oleh operator manusia.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-10">
+        <h2 className="text-2xl font-black tracking-tight text-radar-navy sm:text-3xl">Fitur Utama</h2>
+        <p className="mt-2 max-w-2xl text-radar-muted">Sistem end-to-end dari laporan warga sampai keputusan operator.</p>
+        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {FEATURES.map((feature) => (
+            <div key={feature.title} className="panel">
+              <span className="grid h-10 w-10 place-items-center rounded-xl bg-cyan-50 text-radar-cyan">
+                <feature.icon className="h-5 w-5" aria-hidden="true" />
+              </span>
+              <h3 className="mt-4 font-black text-radar-navy">{feature.title}</h3>
+              <p className="mt-2 text-sm text-radar-muted">{feature.description}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="py-10">
+        <h2 className="text-2xl font-black tracking-tight text-radar-navy sm:text-3xl">Alur Laporan</h2>
+        <div className="mt-6 grid gap-3 sm:grid-cols-5">
+          {FLOW_STEPS.map((step, index) => (
+            <div key={step} className="panel flex flex-col items-start gap-2">
+              <span className="grid h-8 w-8 place-items-center rounded-full bg-radar-navy text-sm font-black text-radar-cyan">
+                {index + 1}
+              </span>
+              <p className="text-sm font-bold text-radar-navy">{step}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="py-6">
+        <div className="flex items-start gap-4 rounded-2xl border border-cyan-200 bg-cyan-50 p-5">
+          <BellRing className="mt-0.5 h-5 w-5 shrink-0 text-radar-cyan" aria-hidden="true" />
+          <p className="text-sm text-radar-muted">
+            <strong className="text-radar-navy">RADAR Demo Mode</strong> — data dan sebagian layanan pada demo ini
+            menggunakan simulasi untuk kebutuhan MVP. Prediksi AI memakai fallback deterministik dan bukan model yang
+            sudah dilatih pada dataset bencana nyata.
+          </p>
+        </div>
       </section>
     </AppShell>
   );
