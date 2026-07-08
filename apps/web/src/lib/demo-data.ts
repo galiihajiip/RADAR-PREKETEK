@@ -1,6 +1,9 @@
 import generatedReports from "@/data/demo-reports.generated.json";
 import type { DamageReport, ReportStatus, Severity } from "@radar/shared";
 import { fallbackPrediction } from "@/lib/ai-fallback";
+import { predictSeverity } from "@/lib/ai-service";
+
+export type ReportImageInput = { buffer: Buffer; contentType: string };
 
 export const reports: DamageReport[] = generatedReports as DamageReport[];
 
@@ -26,12 +29,13 @@ export function getReportById(id: string) {
   return reports.find((report) => report.id === id || report.localId === id || report.local_id === id);
 }
 
-export function createDemoReport(payload: Record<string, unknown>) {
+export async function createDemoReport(payload: Record<string, unknown>, image?: ReportImageInput) {
   const localId = String(payload.localId ?? payload.local_id ?? `local-${Date.now()}`);
   const existing = reports.find((report) => report.localId === localId || report.local_id === localId);
   if (existing) return existing;
 
-  const aiPrediction = fallbackPrediction({ ...payload, localId });
+  const aiPrediction =
+    (image && (await predictSeverity(image.buffer, image.contentType))) ?? fallbackPrediction({ ...payload, localId });
   const now = new Date().toISOString();
   const report: DamageReport = {
     id: `rpt-${Date.now()}`,

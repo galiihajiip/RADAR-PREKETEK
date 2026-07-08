@@ -1,5 +1,9 @@
 import { SEVERITY_COLORS, SEVERITY_LABEL_ID, type Role, type Severity } from "@radar/shared";
 
+export function cn(...classes: Array<string | false | null | undefined>) {
+  return classes.filter(Boolean).join(" ");
+}
+
 export function severityColor(severity: Severity) {
   return SEVERITY_COLORS[severity] ?? SEVERITY_COLORS.unknown;
 }

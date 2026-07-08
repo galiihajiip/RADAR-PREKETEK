@@ -10,6 +10,9 @@ export type ReportPayload = {
   longitude: number | string;
   imagePreview?: string;
   imageContentType?: string;
+  // Real file for direct online submission only - never persisted to the
+  // offline queue (localStorage can't hold binary blobs), so it's optional.
+  imageFile?: File;
 };
 
 export type ReportFilters = {
@@ -26,6 +29,17 @@ async function readResponse<T>(response: Response): Promise<T> {
 }
 
 export async function createReport(payload: ReportPayload) {
+  if (payload.imageFile) {
+    const form = new FormData();
+    for (const [key, value] of Object.entries(payload)) {
+      if (key === "imageFile" || value === undefined) continue;
+      form.append(key, String(value));
+    }
+    form.append("image", payload.imageFile);
+    const response = await fetch("/api/reports", { method: "POST", body: form });
+    return readResponse<DamageReport>(response);
+  }
+
   const response = await fetch("/api/reports", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
