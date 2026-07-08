@@ -1,97 +1,227 @@
+import Link from "next/link";
 import { AuthGuard } from "@/components/auth-guard";
 import { AppShell } from "@/components/shell";
 import { MetricCard, SectionHeader, SeverityBadge } from "@/components/ui";
-import { reports } from "@/lib/demo-data";
+import { fullSummary, reports } from "@/lib/demo-data";
+import { AlertTriangle, BarChart3, ClipboardList, FileText, Settings, Shield } from "lucide-react";
 
 export default function DashboardPage() {
-  const visibleReports = reports.slice(0, 100);
-  const highConfidence = reports.filter((report) => report.confidence >= 0.85).length;
-  const openCases = reports.filter((report) => !["validated", "rejected"].includes(report.status)).length;
-  const severityColor = (severity: string) =>
-    severity === "destroyed" ? "#D62828" : severity === "major_damage" ? "#F77F00" : severity === "minor_damage" ? "#F4D35E" : "#2A9D8F";
+  const stats = fullSummary();
+  const latestReports = reports.slice(0, 12);
+  const destroyedHighConf = reports.filter(
+    (r) => r.severity === "destroyed" && r.confidence >= 0.85
+  );
+  const hasCritical = destroyedHighConf.length > 0;
 
   return (
     <AppShell>
       <AuthGuard allowed={["operator", "admin"]}>
-      <SectionHeader title="Operator Command Dashboard" description="Prioritas geospasial, confidence AI, dan validasi manusia dalam satu layar kerja." />
-      <div className="grid gap-4 md:grid-cols-4">
-        <MetricCard label="Total laporan" value={reports.length.toLocaleString("id-ID")} />
-        <MetricCard label="Destroyed" value={reports.filter((r) => r.severity === "destroyed").length.toLocaleString("id-ID")} tone="red" />
-        <MetricCard label="Confidence >=85" value={highConfidence.toLocaleString("id-ID")} tone="green" />
-        <MetricCard label="Open cases" value={openCases.toLocaleString("id-ID")} tone="orange" />
-      </div>
-      <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_420px]">
-        <div className="panel p-4">
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <SectionHeader
+            title="Command Dashboard"
+            description="Pusat kendali operasi penanggulangan bencana RADAR."
+          />
+          <span className="inline-flex items-center gap-2 rounded-full bg-cyan-50 px-4 py-2 text-xs font-black text-radar-cyan">
+            <Shield className="h-4 w-4" aria-hidden />
+            RADAR Demo Mode
+          </span>
+        </div>
+
+        {/* Critical escalation banner */}
+        {hasCritical && (
+          <div className="mb-6 flex items-start gap-4 rounded-2xl border border-red-200 bg-red-50 p-5 shadow-soft">
+            <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-radar-red text-white">
+              <AlertTriangle className="h-5 w-5" />
+            </div>
             <div>
-              <p className="text-xs font-black uppercase tracking-[0.16em] text-radar-muted">Cianjur operational map</p>
-              <h2 className="text-xl font-black text-radar-navy">Damage clusters</h2>
-            </div>
-            <div className="flex flex-wrap gap-2 text-xs font-black">
-              <span className="rounded-full bg-red-50 px-3 py-1 text-radar-red">Destroyed</span>
-              <span className="rounded-full bg-orange-50 px-3 py-1 text-radar-orange">Major</span>
-              <span className="rounded-full bg-yellow-50 px-3 py-1 text-yellow-700">Minor</span>
+              <h2 className="font-black text-radar-red">Eskalasi Kritis</h2>
+              <p className="mt-1 text-sm text-radar-red/80">
+                Terdapat <strong>{destroyedHighConf.length}</strong> laporan berstatus{" "}
+                <strong>Hancur Total</strong> dengan confidence AI ≥85%.
+                Prioritaskan validasi laporan ini segera.
+              </p>
+              <Link
+                href="/dashboard/reports?severity=destroyed"
+                className="btn-danger mt-3 inline-flex"
+              >
+                Lihat Laporan Kritis
+              </Link>
             </div>
           </div>
-          <div className="map-grid relative h-[520px] overflow-hidden rounded-2xl border border-radar-border">
-            <div className="absolute left-[8%] top-[12%] h-64 w-64 rounded-full border border-radar-cyan/30" />
-            <div className="absolute right-[12%] top-[28%] h-72 w-72 rounded-full border border-radar-blue/20" />
-            <div className="absolute bottom-[10%] left-[28%] h-48 w-48 rounded-full border border-radar-red/20" />
-            {visibleReports.slice(0, 70).map((report, index) => {
-              const left = 8 + ((index * 17) % 82);
-              const top = 10 + ((index * 29) % 76);
-              const size = report.severity === "destroyed" ? 18 : report.severity === "major_damage" ? 15 : 12;
-              return (
-                <div key={report.id} className="group absolute" style={{ left: `${left}%`, top: `${top}%` }}>
-                  <div
-                    className="rounded-full border-4 border-white shadow-lg transition group-hover:scale-125"
-                    style={{ backgroundColor: severityColor(report.severity), width: size, height: size }}
-                  />
-                  <div className="pointer-events-none absolute left-4 top-4 hidden w-48 rounded-xl bg-white p-3 text-xs shadow-soft group-hover:block">
-                    <p className="font-black text-radar-navy">{report.address}</p>
-                    <p className="mt-1 text-radar-muted">{Math.round(report.confidence * 100)}% confidence</p>
+        )}
+
+        {/* Metric cards */}
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+          <MetricCard label="Total Laporan" value={stats.total.toLocaleString("id-ID")} />
+          <MetricCard
+            label="Hancur Total"
+            value={stats.destroyed.toLocaleString("id-ID")}
+            tone="red"
+          />
+          <MetricCard
+            label="Rata-rata Confidence AI"
+            value={`${Math.round(stats.avgConfidence * 100)}%`}
+          />
+          <MetricCard
+            label="Menunggu Validasi"
+            value={stats.pendingValidation.toLocaleString("id-ID")}
+            tone="orange"
+          />
+          <MetricCard
+            label="Tersinkron Offline"
+            value={stats.offlineSynced.toLocaleString("id-ID")}
+            tone="green"
+          />
+        </div>
+
+        {/* Main content: Latest reports + Incident feed */}
+        <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_380px]">
+          {/* Latest reports panel */}
+          <div className="panel p-0">
+            <div className="border-b border-radar-border p-5">
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-radar-muted">
+                Laporan Terbaru
+              </p>
+              <h2 className="mt-1 text-xl font-black text-radar-navy">
+                Prioritas Validasi
+              </h2>
+            </div>
+            <div className="max-h-[520px] overflow-y-auto">
+              {latestReports.map((report) => (
+                <Link
+                  key={report.id}
+                  href={`/dashboard/reports/${report.id}`}
+                  className="block border-b border-radar-border p-4 transition hover:bg-slate-50"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0 flex-1">
+                      <h3 className="truncate font-black leading-tight text-radar-navy">
+                        {report.address}
+                      </h3>
+                      <p className="mt-1 text-xs font-bold uppercase tracking-[0.12em] text-radar-muted">
+                        {report.status.replace(/_/g, " ")}
+                      </p>
+                    </div>
+                    <SeverityBadge severity={report.severity} />
                   </div>
-                </div>
-              );
-            })}
-            <div className="absolute bottom-4 left-4 grid gap-2 rounded-2xl bg-white/95 p-4 shadow-soft">
-              <p className="text-xs font-black uppercase tracking-[0.12em] text-radar-muted">Current filter</p>
-              <p className="font-black text-radar-navy">All reports - first 70 markers</p>
-              <p className="text-xs text-radar-muted">Full dataset available in API/export.</p>
+                  <p className="mt-2 line-clamp-1 text-sm text-radar-muted">
+                    {report.description}
+                  </p>
+                  <div className="mt-3 flex items-center gap-3">
+                    <div className="h-2 flex-1 overflow-hidden rounded-full bg-slate-100">
+                      <div
+                        className="h-full rounded-full bg-radar-cyan"
+                        style={{ width: `${Math.round(report.confidence * 100)}%` }}
+                      />
+                    </div>
+                    <span className="text-sm font-black tabular text-radar-navy">
+                      {Math.round(report.confidence * 100)}%
+                    </span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {/* Right sidebar: Quick links + live incident feed */}
+          <div className="grid gap-6 content-start">
+            {/* CTA navigation cards */}
+            <div className="grid gap-3">
+              {[
+                {
+                  href: "/dashboard/reports",
+                  icon: ClipboardList,
+                  label: "Daftar Laporan",
+                  desc: "Semua laporan dan filter",
+                },
+                {
+                  href: "/dashboard/analytics",
+                  icon: BarChart3,
+                  label: "Analytics & Export",
+                  desc: "Ringkasan data dan ekspor",
+                },
+                {
+                  href: "/dashboard/admin",
+                  icon: Settings,
+                  label: "Admin Console",
+                  desc: "Pengaturan sistem dan demo tools",
+                },
+                {
+                  href: "/dashboard/audit",
+                  icon: FileText,
+                  label: "Audit Log",
+                  desc: "Riwayat aktivitas sistem",
+                },
+              ].map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="panel flex items-center gap-4 transition hover:border-radar-cyan hover:shadow-lg"
+                >
+                  <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-cyan-50">
+                    <item.icon className="h-5 w-5 text-radar-cyan" />
+                  </div>
+                  <div>
+                    <p className="font-black text-radar-navy">{item.label}</p>
+                    <p className="text-xs text-radar-muted">{item.desc}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+
+            {/* Live incident feed */}
+            <div className="panel p-0">
+              <div className="border-b border-radar-border p-4">
+                <p className="text-xs font-black uppercase tracking-[0.16em] text-radar-muted">
+                  Live Incident Feed
+                </p>
+                <h2 className="mt-1 text-lg font-black text-radar-navy">
+                  Aktivitas Terakhir
+                </h2>
+              </div>
+              <div className="max-h-[280px] overflow-y-auto">
+                {reports.slice(0, 8).map((r) => (
+                  <div
+                    key={`feed-${r.id}`}
+                    className="flex items-start gap-3 border-b border-radar-border p-3 last:border-0"
+                  >
+                    <div
+                      className="mt-1 h-3 w-3 shrink-0 rounded-full"
+                      style={{
+                        backgroundColor:
+                          r.severity === "destroyed"
+                            ? "#D62828"
+                            : r.severity === "major_damage"
+                              ? "#F77F00"
+                              : r.severity === "minor_damage"
+                                ? "#F4D35E"
+                                : "#2A9D8F",
+                      }}
+                    />
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-bold text-radar-navy">
+                        {r.address}
+                      </p>
+                      <p className="text-xs text-radar-muted">
+                        {r.status.replace(/_/g, " ")} &middot;{" "}
+                        {Math.round(r.confidence * 100)}% conf
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Demo mode notice */}
+            <div className="rounded-xl border border-cyan-200 bg-cyan-50 p-4 text-sm">
+              <p className="font-black text-radar-navy">RADAR Demo Mode</p>
+              <p className="mt-1 text-radar-muted">
+                Data dan sebagian layanan menggunakan simulasi untuk kebutuhan MVP.
+                AI prediction menggunakan fallback deterministik.
+              </p>
             </div>
           </div>
         </div>
-        <div className="panel max-h-[640px] overflow-hidden p-0">
-          <div className="border-b border-radar-border p-4">
-            <p className="text-xs font-black uppercase tracking-[0.16em] text-radar-muted">Validation Queue</p>
-            <h2 className="mt-1 text-xl font-black text-radar-navy">High-priority reports</h2>
-          </div>
-          <div className="grid max-h-[560px] gap-0 overflow-y-auto">
-          {visibleReports.slice(0, 24).map((report) => (
-            <article className="border-b border-radar-border p-4 transition hover:bg-slate-50" key={report.id}>
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <h3 className="font-black leading-tight text-radar-navy">{report.address}</h3>
-                  <p className="mt-1 text-xs font-bold uppercase tracking-[0.12em] text-radar-muted">{report.status.replace("_", " ")}</p>
-                </div>
-                <SeverityBadge severity={report.severity} />
-              </div>
-              <p className="mt-2 line-clamp-2 text-sm text-radar-muted">{report.description}</p>
-              <div className="mt-4 flex items-center justify-between gap-3">
-                <div className="h-2 flex-1 overflow-hidden rounded-full bg-slate-100">
-                  <div className="h-full rounded-full bg-radar-cyan" style={{ width: `${Math.round(report.confidence * 100)}%` }} />
-                </div>
-                <p className="text-sm font-black tabular text-radar-navy">{Math.round(report.confidence * 100)}%</p>
-              </div>
-              <div className="mt-4 grid grid-cols-2 gap-2">
-                <button className="btn-success">Confirm</button>
-                <button className="btn-warning">Override</button>
-              </div>
-            </article>
-          ))}
-          </div>
-        </div>
-      </div>
       </AuthGuard>
     </AppShell>
   );

@@ -15,8 +15,9 @@ const links: Array<[string, string, Role[]]> = [
   ["/offline", "Queue", ["citizen", "operator", "admin"]],
   ["/dashboard", "Dashboard", ["operator", "admin"]],
   ["/dashboard/reports", "Reports", ["operator", "admin"]],
-  ["/analytics", "Analytics", ["operator", "admin"]],
-  ["/admin", "Admin", ["admin"]]
+  ["/dashboard/analytics", "Analytics", ["operator", "admin"]],
+  ["/dashboard/admin", "Admin", ["admin"]],
+  ["/dashboard/audit", "Audit", ["operator", "admin"]]
 ];
 
 export function AppShell({ children }: { children: React.ReactNode }) {

@@ -91,6 +91,147 @@ export function createDemoReport(payload: Record<string, unknown>) {
   return report;
 }
 
+export interface AnalyticsSummary {
+  total: number;
+  destroyed: number;
+  majorDamage: number;
+  minorDamage: number;
+  noDamage: number;
+  unknown: number;
+  avgConfidence: number;
+  pendingValidation: number;
+  validated: number;
+  rejected: number;
+  escalated: number;
+  offlineSynced: number;
+}
+
+export function fullSummary(): AnalyticsSummary {
+  const total = reports.length;
+  const destroyed = reports.filter((r) => r.severity === "destroyed").length;
+  const majorDamage = reports.filter((r) => r.severity === "major_damage").length;
+  const minorDamage = reports.filter((r) => r.severity === "minor_damage").length;
+  const noDamage = reports.filter((r) => r.severity === "no_damage").length;
+  const unknown = reports.filter((r) => r.severity === "unknown").length;
+  const avgConfidence = total > 0 ? reports.reduce((sum, r) => sum + r.confidence, 0) / total : 0;
+  const pendingValidation = reports.filter((r) => !["validated", "rejected"].includes(r.status)).length;
+  const validated = reports.filter((r) => r.status === "validated").length;
+  const rejected = reports.filter((r) => r.status === "rejected").length;
+  const escalated = reports.filter((r) => r.status === "escalated").length;
+  const offlineSynced = reports.filter((r) => r.syncStatus === "synced").length;
+  return {
+    total,
+    destroyed,
+    majorDamage,
+    minorDamage,
+    noDamage,
+    unknown,
+    avgConfidence: Number(avgConfidence.toFixed(4)),
+    pendingValidation,
+    validated,
+    rejected,
+    escalated,
+    offlineSynced,
+  };
+}
+
+export interface AuditEntry {
+  id: string;
+  action: string;
+  actionLabel: string;
+  actor: string;
+  role: string;
+  reportId?: string;
+  reportTitle?: string;
+  timestamp: string;
+  note?: string;
+}
+
+export function generateAuditLog(): AuditEntry[] {
+  const entries: AuditEntry[] = [];
+  for (const r of reports.slice(0, 200)) {
+    entries.push({
+      id: `audit-created-${r.id}`,
+      action: "report_created",
+      actionLabel: "Laporan Dibuat",
+      actor: r.reporterName || "Warga",
+      role: "citizen",
+      reportId: r.id,
+      reportTitle: r.address,
+      timestamp: r.createdAt,
+      note: r.description?.slice(0, 80),
+    });
+    if (r.aiPrediction || r.status !== "draft") {
+      const aiTime = new Date(new Date(r.createdAt).getTime() + 2000).toISOString();
+      entries.push({
+        id: `audit-ai-${r.id}`,
+        action: "ai_completed",
+        actionLabel: "AI Selesai",
+        actor: "RADAR AI",
+        role: "system",
+        reportId: r.id,
+        reportTitle: r.address,
+        timestamp: aiTime,
+        note: `Severity: ${r.aiPrediction?.severity ?? r.severity}, Confidence: ${Math.round((r.aiPrediction?.confidence ?? r.confidence) * 100)}%`,
+      });
+    }
+    if (r.status === "validated" && r.validatedAt) {
+      entries.push({
+        id: `audit-validated-${r.id}`,
+        action: "validated",
+        actionLabel: "Tervalidasi",
+        actor: "Demo Operator",
+        role: "operator",
+        reportId: r.id,
+        reportTitle: r.address,
+        timestamp: r.validatedAt,
+        note: r.validationNote || "Dikonfirmasi oleh operator.",
+      });
+    }
+    if (r.severityFinal && r.severityFinal !== r.aiPrediction?.severity && r.validatedAt) {
+      entries.push({
+        id: `audit-overridden-${r.id}`,
+        action: "overridden",
+        actionLabel: "Override Severity",
+        actor: "Demo Operator",
+        role: "operator",
+        reportId: r.id,
+        reportTitle: r.address,
+        timestamp: r.validatedAt,
+        note: `Final severity: ${r.severityFinal}`,
+      });
+    }
+    if (r.status === "rejected" && r.rejectedAt) {
+      entries.push({
+        id: `audit-rejected-${r.id}`,
+        action: "rejected",
+        actionLabel: "Ditolak",
+        actor: "Demo Operator",
+        role: "operator",
+        reportId: r.id,
+        reportTitle: r.address,
+        timestamp: r.rejectedAt,
+        note: r.validationNote || "Laporan ditolak.",
+      });
+    }
+    if (r.status === "escalated") {
+      entries.push({
+        id: `audit-escalated-${r.id}`,
+        action: "escalated",
+        actionLabel: "Eskalasi",
+        actor: "RADAR System",
+        role: "system",
+        reportId: r.id,
+        reportTitle: r.address,
+        timestamp: r.updatedAt,
+        note: "Laporan kritis di-eskalasi otomatis.",
+      });
+    }
+  }
+  entries.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+  return entries;
+}
+
 export function validateDemoReport(
   id: string,
   action: "confirm_ai" | "override" | "reject",
