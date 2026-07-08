@@ -19,8 +19,8 @@ export function MapClient({ reports }: { reports: DamageReport[] }) {
 
   return (
     <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
-      <div className="overflow-hidden rounded-2xl border border-radar-border shadow-soft">
-        <MapContainer center={CIANJUR_CENTER} zoom={12} scrollWheelZoom style={{ height: "560px", width: "100%" }}>
+      <div className="overflow-hidden rounded-2xl border border-radar-border bg-white p-2 shadow-sm">
+        <MapContainer center={CIANJUR_CENTER} zoom={12} scrollWheelZoom style={{ height: "min(62vh, 560px)", minHeight: "360px", width: "100%", borderRadius: "0.75rem" }}>
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -50,10 +50,10 @@ export function MapClient({ reports }: { reports: DamageReport[] }) {
 
       <aside className="grid h-fit gap-4">
         <div className="panel">
-          <h2 className="font-black text-radar-navy">Filter Severity</h2>
+          <h2 className="font-black text-radar-navy">Filter Kerusakan</h2>
           <div className="mt-3 grid gap-2">
             <button
-              className={`rounded-lg px-3 py-2 text-left text-sm font-bold ${severityFilter === "" ? "bg-radar-navy text-white" : "bg-slate-50 text-radar-navy hover:bg-slate-100"}`}
+              className={`rounded-xl border px-3 py-2 text-left text-sm font-bold ${severityFilter === "" ? "border-blue-600 bg-blue-50 text-blue-700" : "border-radar-border bg-white text-radar-navy hover:bg-slate-50"}`}
               onClick={() => setSeverityFilter("")}
             >
               Semua severity ({reports.length.toLocaleString("id-ID")})
@@ -63,7 +63,7 @@ export function MapClient({ reports }: { reports: DamageReport[] }) {
               return (
                 <button
                   key={severity}
-                  className={`flex items-center justify-between rounded-lg px-3 py-2 text-left text-sm font-bold ${severityFilter === severity ? "bg-radar-navy text-white" : "bg-slate-50 text-radar-navy hover:bg-slate-100"}`}
+                  className={`flex items-center justify-between rounded-xl border px-3 py-2 text-left text-sm font-bold ${severityFilter === severity ? "border-blue-600 bg-blue-50 text-blue-700" : "border-radar-border bg-white text-radar-navy hover:bg-slate-50"}`}
                   onClick={() => setSeverityFilter(severity)}
                 >
                   <span className="flex items-center gap-2">
