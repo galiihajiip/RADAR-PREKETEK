@@ -26,3 +26,4 @@ Thumbs.db
 dev-server.log
 dev-server.err.log
 package-lock.from-wrong-folder.json
+*.md
