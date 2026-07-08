@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
-import { reports } from "@/lib/demo-data";
+import { getReports } from "@/lib/reports-repo";
 
-export function GET() {
+export async function GET() {
+  const reports = await getReports({ limit: 5000 });
   return NextResponse.json({
     success: true,
     data: reports.map((r) => ({

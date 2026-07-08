@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { reports } from "@/lib/demo-data";
+import { getReports } from "@/lib/reports-repo";
 
 function esc(value: string) {
   if (value.includes(",") || value.includes('"') || value.includes("\n")) {
@@ -8,7 +8,8 @@ function esc(value: string) {
   return value;
 }
 
-export function GET() {
+export async function GET() {
+  const reports = await getReports({ limit: 5000 });
   const header = "report_id,title,severity_ai,severity_final,confidence,status,lat,lng,address,reported_at";
   const rows = reports.map((r) =>
     [

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { fullSummary } from "@/lib/demo-data";
+import { getFullSummary } from "@/lib/reports-repo";
 
-export function GET() {
-  return NextResponse.json({ success: true, data: fullSummary() });
+export async function GET() {
+  return NextResponse.json({ success: true, data: await getFullSummary() });
 }
