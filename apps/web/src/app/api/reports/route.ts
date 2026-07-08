@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import type { ReportStatus, Severity } from "@radar/shared";
-import { createDemoReport, filterReports } from "@/lib/demo-data";
+import { createReport, getReports } from "@/lib/reports-repo";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -8,11 +8,12 @@ export async function GET(request: NextRequest) {
   const status = (searchParams.get("status") || undefined) as ReportStatus | undefined;
   const min = searchParams.get("min_confidence");
   const q = searchParams.get("q") ?? undefined;
-  return NextResponse.json({ success: true, data: filterReports(severity, min ? Number(min) : undefined, q, status).slice(0, 250) });
+  const data = await getReports({ severity, status, minConfidence: min ? Number(min) : undefined, q });
+  return NextResponse.json({ success: true, data });
 }
 
 export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => ({}));
-  const created = createDemoReport(body);
+  const created = await createReport(body);
   return NextResponse.json({ success: true, data: created }, { status: 201 });
 }

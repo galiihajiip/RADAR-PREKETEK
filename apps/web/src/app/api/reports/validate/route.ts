@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import type { Severity } from "@radar/shared";
-import { validateDemoReport } from "@/lib/demo-data";
+import { validateReport } from "@/lib/reports-repo";
 
 export async function POST(request: NextRequest) {
   const role = request.headers.get("x-demo-role") ?? "citizen";
@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
   const action = body.action === "reject" ? "reject" : body.action === "override" ? "override" : "confirm_ai";
   const note = typeof body.note === "string" ? body.note : undefined;
   const severityFinal = typeof body.severityFinal === "string" ? (body.severityFinal as Severity) : undefined;
-  const report = validateDemoReport(reportId, action, note, severityFinal);
+  const report = await validateReport(reportId, action, note, severityFinal);
   if (!report) {
     return NextResponse.json(
       { success: false, error: { code: "NOT_FOUND", message: "Laporan tidak ditemukan." } },
