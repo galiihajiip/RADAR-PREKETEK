@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { Database, Menu, Phone, Radio, ShieldCheck, Wifi, WifiOff, X } from "lucide-react";
 import { RadarLogo } from "./ui";
 import { SessionPill } from "./session-pill";
+import { InstallAppPrompt } from "./install-app-prompt";
 import { getDemoUser } from "@/lib/demo-auth";
 import { requireRole } from "@/lib/utils";
 import type { Role } from "@radar/shared";
@@ -166,6 +167,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         )}
       </header>
       <div className="mx-auto max-w-7xl px-4 py-8">{children}</div>
+      <InstallAppPrompt />
       <footer className="border-t border-radar-border bg-white">
         <div className="mx-auto grid max-w-7xl gap-6 px-4 py-8 text-sm text-radar-muted md:grid-cols-[1.4fr_1fr_1fr]">
           <div>
