@@ -14,9 +14,13 @@ RADAR PREKETEK saat ini ditargetkan sebagai MVP hackathon. Sistem dibuat untuk m
 - Upload biner foto belum menjadi jalur produksi; form memakai path/mock preview agar alur laporan, AI fallback, dan validasi tetap bisa didemokan.
 - Autentikasi demo tidak setara dengan keamanan produksi.
 - Peta dapat menggunakan panel fallback jika map tile atau koneksi internet bermasalah.
-- Export CSV/GeoJSON ditujukan untuk demo interoperabilitas, belum mencakup semua kebutuhan operasional posko.
+- Export CSV/GeoJSON/JSON ditujukan untuk demo interoperabilitas, belum mencakup semua kebutuhan operasional posko.
 - Eskalasi dan notifikasi dapat berupa simulasi UI, bukan integrasi SMS, WhatsApp, email, atau radio dispatch sungguhan.
-- Audit log demo bisa belum persisten lintas restart jika belum memakai database produksi.
+- Audit log demo diturunkan dari data laporan yang tersedia; belum persisten lintas restart jika belum memakai database produksi.
+- Dashboard command center menggunakan data in-memory, tidak real-time.
+- Analytics menggunakan kalkulasi sisi server dari data demo, bukan agregasi database.
+- Tombol demo tools (simulasi hancur, reset seed) masih placeholder di MVP.
+- Leaflet, Supabase, PostGIS, Push Notification, dan Service Worker belum diimplementasikan di Block 3.
 
 ## Yang Harus Dijelaskan Saat Demo
 
@@ -25,6 +29,8 @@ RADAR PREKETEK saat ini ditargetkan sebagai MVP hackathon. Sistem dibuat untuk m
 - Jika peta memakai tampilan fallback, sebutkan bahwa integrasi produksi memakai Leaflet/OpenStreetMap atau GIS lain.
 - Jika login memakai demo role, sebutkan bahwa autentikasi produksi masih roadmap.
 - Jika foto tampil sebagai aset/mock, sebutkan bahwa storage produksi dan validasi gambar masih roadmap.
+- Dashboard analytics adalah kalkulasi dari data demo in-memory, bukan real-time analytics.
+- Audit log diturunkan dari metadata laporan demo, produksi akan memakai tabel audit terpisah.
 
 ## Risiko Jika Dipakai Di Luar Demo
 
@@ -42,3 +48,6 @@ RADAR PREKETEK saat ini ditargetkan sebagai MVP hackathon. Sistem dibuat untuk m
 - Realtime dashboard untuk banyak operator.
 - Integrasi notifikasi resmi.
 - Pengujian aksesibilitas, performa, dan keamanan.
+- Audit log persisten dengan tabel terpisah.
+- Demo tools fungsional (simulasi hancur, reset seed).
+- Leaflet/OpenStreetMap terintegrasi penuh.
