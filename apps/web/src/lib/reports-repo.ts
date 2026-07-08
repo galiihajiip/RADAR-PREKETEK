@@ -1,4 +1,4 @@
-import type { AnalyticsSummary, AuditEntry } from "@/lib/demo-data";
+import type { AnalyticsSummary, AuditEntry, ReportImageInput } from "@/lib/demo-data";
 import * as demo from "@/lib/demo-data";
 import * as live from "@/lib/supabase-reports";
 import type { DamageReport, ReportStatus, Severity } from "@radar/shared";
@@ -33,9 +33,9 @@ export async function getReportById(id: string): Promise<DamageReport | null> {
   return live.getReportById(id);
 }
 
-export async function createReport(payload: Record<string, unknown>): Promise<DamageReport> {
-  if (isDemoMode()) return demo.createDemoReport(payload);
-  return live.createReport(payload);
+export async function createReport(payload: Record<string, unknown>, image?: ReportImageInput): Promise<DamageReport> {
+  if (isDemoMode()) return demo.createDemoReport(payload, image);
+  return live.createReport(payload, image);
 }
 
 export async function validateReport(
