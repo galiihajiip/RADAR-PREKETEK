@@ -93,7 +93,7 @@ export function ReportDetailClient({ reportId }: { reportId: string }) {
     );
   }
 
-  const imageSrc = report.image?.url && report.image.url.startsWith("/") ? report.image.url : "/radar-mark.svg";
+  const imageSrc = report.image?.url && !report.image.url.startsWith("mock://") ? report.image.url : "/radar-mark.svg";
 
   return (
     <AppShell>
@@ -137,8 +137,7 @@ export function ReportDetailClient({ reportId }: { reportId: string }) {
                 <div className="grid gap-3 text-sm">
                   <p><span className="font-black">Pelapor:</span> {report.reporterName}</p>
                   <p><span className="font-black">Koordinat:</span> {report.latitude}, {report.longitude}</p>
-                  <p><span className="font-black">Foto:</span> {report.image?.url?.startsWith("mock://") ? "Mock image path; upload biner belum aktif." : "Aset demo."}</p>
-                  <p className="rounded-xl bg-cyan-50 p-3 font-bold text-radar-blue">Produksi proposal menargetkan upload storage dan validasi kualitas gambar. Block 2 menjaga bukti foto sebagai mock agar flow validasi tetap berjalan.</p>
+                  <p><span className="font-black">Foto:</span> {report.image?.url?.startsWith("mock://") ? "Laporan offline queue: bukti foto memakai mock (upload biner belum aktif di jalur ini)." : report.image ? "Foto asli tersimpan di Supabase Storage." : "Tidak ada foto terlampir."}</p>
                 </div>
               </div>
             </section>
