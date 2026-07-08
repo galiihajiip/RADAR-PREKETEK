@@ -1,16 +1,19 @@
 import { Activity, AlertTriangle, CheckCircle2, Clock, Radio, Shield, TrendingUp, Wifi, WifiOff } from "lucide-react";
 import { ROLES, SEVERITY_COLORS, SEVERITY_LABEL_ID, type Role, type Severity } from "@radar/shared";
+import { cn } from "@/lib/utils";
 
 export function RadarLogo({ compact = false }: { compact?: boolean }) {
   return (
     <div className="flex items-center gap-3">
-      <div className="grid h-10 w-10 place-items-center rounded-xl bg-radar-navy text-radar-cyan shadow-soft">
+      <div className="grid h-12 w-12 place-items-center rounded-full border border-blue-100 bg-white text-radar-blue shadow-sm">
         <Shield aria-hidden className="h-6 w-6" />
       </div>
       {!compact && (
         <div>
           <div className="text-lg font-black tracking-tight text-radar-navy">RADAR</div>
-          <div className="text-xs font-semibold text-radar-muted">Damage Assessment Response</div>
+          <div className="max-w-[220px] text-xs font-bold uppercase leading-5 text-radar-navy">
+            Sistem Asesmen Kerusakan Pascabencana
+          </div>
         </div>
       )}
     </div>
@@ -20,8 +23,8 @@ export function RadarLogo({ compact = false }: { compact?: boolean }) {
 export function SeverityBadge({ severity }: { severity: Severity }) {
   return (
     <span
-      className="inline-flex items-center rounded-full px-3 py-1 text-xs font-bold text-white"
-      style={{ backgroundColor: SEVERITY_COLORS[severity] }}
+      className="inline-flex items-center rounded-full border px-3 py-1 text-xs font-black"
+      style={{ borderColor: SEVERITY_COLORS[severity], color: SEVERITY_COLORS[severity], backgroundColor: `${SEVERITY_COLORS[severity]}14` }}
     >
       {SEVERITY_LABEL_ID[severity]}
     </span>
@@ -38,7 +41,7 @@ export function OnlineStatusBadge({ online }: { online: boolean }) {
 }
 
 export function RoleBadge({ role }: { role: Role }) {
-  return <span className="rounded-full bg-radar-navy px-3 py-1 text-xs font-bold capitalize text-white">{ROLES.includes(role) ? role : "citizen"}</span>;
+  return <span className="rounded-full border border-radar-border bg-slate-50 px-3 py-1 text-xs font-black capitalize text-radar-navy">{ROLES.includes(role) ? role : "citizen"}</span>;
 }
 
 export function MetricCard({ label, value, delta, tone = "blue" }: { label: string; value: string | number; delta?: string; tone?: "blue" | "red" | "green" | "orange" }) {
@@ -52,18 +55,19 @@ export function MetricCard({ label, value, delta, tone = "blue" }: { label: stri
           <Activity className={`h-5 w-5 ${color}`} />
         </span>
       </div>
-      <div className="mt-4 text-3xl font-black tabular text-radar-navy">{value}</div>
+      <div className="mt-4 text-3xl font-black tabular-nums text-radar-navy">{value}</div>
       {delta && <p className="mt-2 flex items-center gap-1 text-sm font-bold text-radar-muted"><TrendingUp className="h-3.5 w-3.5" />{delta}</p>}
     </div>
   );
 }
 
-export function SectionHeader({ title, description }: { title: string; description?: string }) {
+export function SectionHeader({ title, description, eyebrow }: { title: string; description?: string; eyebrow?: string }) {
   return (
     <div className="mb-6 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
       <div>
-      <h1 className="text-2xl font-black tracking-tight text-radar-navy sm:text-3xl">{title}</h1>
-      {description && <p className="mt-1 max-w-2xl text-sm text-radar-muted">{description}</p>}
+        {eyebrow && <p className="mb-2 text-xs font-black uppercase tracking-[0.16em] text-radar-cyan">{eyebrow}</p>}
+        <h1 className="text-2xl font-black tracking-tight text-radar-navy sm:text-3xl">{title}</h1>
+        {description && <p className="mt-2 max-w-2xl text-sm leading-6 text-radar-muted">{description}</p>}
       </div>
     </div>
   );
@@ -91,7 +95,7 @@ export function LoadingState() {
 
 export function ErrorState({ message }: { message: string }) {
   return (
-    <div className="panel border-radar-red bg-red-50 text-radar-red">
+    <div className={cn("panel border-red-200 bg-red-50 text-radar-red")}>
       <AlertTriangle className="h-6 w-6" />
       <p className="mt-2 font-semibold">{message}</p>
     </div>
