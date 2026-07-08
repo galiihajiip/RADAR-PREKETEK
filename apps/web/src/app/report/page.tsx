@@ -1,13 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useState } from "react";
+import { ChangeEvent, FormEvent, useState } from "react";
 import { Camera, CheckCircle2, LocateFixed, Send, WifiOff } from "lucide-react";
 import { AuthGuard } from "@/components/auth-guard";
 import { AppShell } from "@/components/shell";
 import { OnlineStatusBadge, SectionHeader } from "@/components/ui";
 import { createReport, type ReportPayload } from "@/lib/api-client";
 import { enqueueReport } from "@/lib/offline-queue";
+import { getDemoUser } from "@/lib/demo-auth";
 import type { DamageReport } from "@radar/shared";
 
 export default function ReportPage() {
@@ -19,6 +20,20 @@ export default function ReportPage() {
   const [lng, setLng] = useState("107.079");
   const [isLocating, setIsLocating] = useState(false);
   const [locationError, setLocationError] = useState("");
+  const [imagePreviewUrl, setImagePreviewUrl] = useState("");
+  const [imageFileName, setImageFileName] = useState("");
+
+  function handleImageChange(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (imagePreviewUrl) URL.revokeObjectURL(imagePreviewUrl);
+    if (file) {
+      setImageFileName(file.name);
+      setImagePreviewUrl(URL.createObjectURL(file));
+    } else {
+      setImageFileName("");
+      setImagePreviewUrl("");
+    }
+  }
 
   function handleGetLocation() {
     if (!navigator.geolocation) {
@@ -85,6 +100,10 @@ export default function ReportPage() {
   }
 
   if (created) {
+    // Citizens submit reports but, like a form respondent, never see the
+    // operator/admin-only review dashboard - so don't show a link/details
+    // that would just land them on the "Login role diperlukan" screen.
+    const canViewDetail = getDemoUser()?.role !== "citizen";
     return (
       <AppShell>
         <AuthGuard allowed={["citizen", "operator", "admin"]}>
@@ -92,17 +111,35 @@ export default function ReportPage() {
             <CheckCircle2 className="h-10 w-10 text-radar-green" />
             <h1 className="mt-4 text-3xl font-black text-radar-navy">Laporan berhasil dibuat</h1>
             <p className="mt-2 text-radar-muted">
-              Laporan masuk dan diproses oleh layanan AI RADAR.
+              {canViewDetail
+                ? "Laporan masuk dan diproses oleh layanan AI RADAR."
+                : "Terima kasih, laporan kamu sudah diterima dan akan ditinjau oleh tim RADAR."}
             </p>
             <div className="mt-5 grid gap-3 rounded-2xl bg-slate-50 p-4 text-sm">
-              <p><span className="font-black">ID:</span> {created.id}</p>
+              <p><span className="font-black">ID Laporan:</span> {created.id}</p>
               <p><span className="font-black">Status:</span> {created.status}</p>
-              <p><span className="font-black">Prediksi AI:</span> {created.aiPrediction?.severity ?? created.severity} ({Math.round((created.aiPrediction?.confidence ?? created.confidence) * 100)}%)</p>
-              <p className="text-radar-muted">Model: {created.aiPrediction?.modelVersion ?? "n/a"} — proof-of-concept, dilatih pada dataset terbatas (belum 4 kelas penuh).</p>
+              {canViewDetail && (
+                <>
+                  <p><span className="font-black">Prediksi AI:</span> {created.aiPrediction?.severity ?? created.severity} ({Math.round((created.aiPrediction?.confidence ?? created.confidence) * 100)}%)</p>
+                  <p className="text-radar-muted">Model: {created.aiPrediction?.modelVersion ?? "n/a"} — proof-of-concept, dilatih pada dataset terbatas (belum 4 kelas penuh).</p>
+                </>
+              )}
             </div>
             <div className="mt-6 flex flex-wrap gap-3">
-              <Link className="btn-primary" href={`/dashboard/reports/${created.id}`}>Buka detail laporan</Link>
-              <button className="btn-warning" onClick={() => setCreated(null)}>Buat laporan lagi</button>
+              {canViewDetail && (
+                <Link className="btn-primary" href={`/dashboard/reports/${created.id}`}>Buka detail laporan</Link>
+              )}
+              <button
+                className="btn-warning"
+                onClick={() => {
+                  if (imagePreviewUrl) URL.revokeObjectURL(imagePreviewUrl);
+                  setImagePreviewUrl("");
+                  setImageFileName("");
+                  setCreated(null);
+                }}
+              >
+                Buat laporan lagi
+              </button>
             </div>
           </div>
         </AuthGuard>
@@ -142,9 +179,33 @@ export default function ReportPage() {
           </div>
           <label className="grid gap-2 text-sm font-bold">
             Foto kerusakan
-            <span className="flex min-h-28 items-center justify-center gap-3 rounded-2xl border border-dashed border-radar-cyan bg-cyan-50/60 p-4 text-center text-radar-blue">
-              <Camera className="h-5 w-5" aria-hidden="true" /> Ambil atau unggah foto kerusakan
-              <input name="image" type="file" accept="image/*" className="sr-only" aria-label="Unggah foto kerusakan" />
+            <span
+              className={`flex min-h-28 items-center justify-center gap-3 rounded-2xl border border-dashed p-4 text-center ${
+                imageFileName ? "border-radar-green bg-green-50/60 text-radar-green" : "border-radar-cyan bg-cyan-50/60 text-radar-blue"
+              }`}
+            >
+              {imagePreviewUrl ? (
+                <img src={imagePreviewUrl} alt="Preview foto kerusakan" className="h-20 w-20 rounded-lg object-cover" />
+              ) : (
+                <Camera className="h-5 w-5" aria-hidden="true" />
+              )}
+              <span>
+                {imageFileName ? (
+                  <>
+                    <CheckCircle2 className="mb-0.5 mr-1 inline h-4 w-4" /> {imageFileName}
+                  </>
+                ) : (
+                  "Ambil atau unggah foto kerusakan"
+                )}
+              </span>
+              <input
+                name="image"
+                type="file"
+                accept="image/*"
+                className="sr-only"
+                aria-label="Unggah foto kerusakan"
+                onChange={handleImageChange}
+              />
             </span>
           </label>
           <label className="flex items-start gap-3 rounded-xl border border-radar-border bg-slate-50 p-4 text-sm leading-relaxed">
