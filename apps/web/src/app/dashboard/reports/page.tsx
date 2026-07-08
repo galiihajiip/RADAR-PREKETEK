@@ -6,6 +6,7 @@ import { AuthGuard } from "@/components/auth-guard";
 import { AppShell } from "@/components/shell";
 import { EmptyState, ErrorState, LoadingState, SectionHeader, SeverityBadge } from "@/components/ui";
 import { getReports, type ReportFilters } from "@/lib/api-client";
+import { getSupabaseBrowserClient } from "@/lib/supabase/browser";
 import { REPORT_STATUS, SEVERITY, type DamageReport, type ReportStatus, type Severity } from "@radar/shared";
 
 function StatusBadge({ status }: { status: ReportStatus }) {
@@ -40,6 +41,26 @@ export default function DashboardReportsPage() {
     return () => {
       active = false;
     };
+  }, [filters]);
+
+  // Live refresh: when Supabase Realtime is configured, refetch the current
+  // filtered list on any damage_reports change instead of waiting for a
+  // manual reload.
+  useEffect(() => {
+    const supabase = getSupabaseBrowserClient();
+    if (!supabase) return;
+    let active = true;
+    const channel = supabase
+      .channel("dashboard_reports_list_changes")
+      .on("postgres_changes", { event: "*", schema: "public", table: "damage_reports" }, () => {
+        if (active) getReports(filters).then(setReports).catch(() => {});
+      })
+      .subscribe();
+    return () => {
+      active = false;
+      supabase.removeChannel(channel);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters]);
 
   return (
