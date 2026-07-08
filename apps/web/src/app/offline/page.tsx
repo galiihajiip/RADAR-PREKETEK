@@ -100,8 +100,8 @@ export default function OfflinePage() {
           </div>
           <div className="panel h-fit border-radar-orange bg-orange-50">
             <ServerCrash className="h-8 w-8 text-radar-orange" />
-            <h3 className="mt-3 font-black text-radar-navy">Failure becomes a workflow</h3>
-            <p className="mt-2 text-sm text-radar-muted">Block 2 masih memakai localStorage. Target produksi proposal adalah Service Worker dan IndexedDB.</p>
+            <h3 className="mt-3 font-black text-radar-navy">Data tetap aman saat jaringan putus</h3>
+            <p className="mt-2 text-sm leading-6 text-radar-muted">MVP saat ini memakai localStorage. Target produksi proposal adalah Service Worker dan IndexedDB untuk antrean offline sungguhan.</p>
           </div>
         </div>
       ) : (
