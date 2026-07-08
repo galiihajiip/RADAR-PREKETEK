@@ -1,5 +1,6 @@
-import { RoutePlaceholder } from "@/components/route-placeholder";
+import { ReportDetailClient } from "./report-detail-client";
 
-export default function DashboardReportDetailPage() {
-  return <RoutePlaceholder route="/dashboard/reports/[id]" />;
+export default async function DashboardReportDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  return <ReportDetailClient reportId={id} />;
 }

@@ -14,6 +14,7 @@ const links: Array<[string, string, Role[]]> = [
   ["/report", "Citizen", ["citizen", "operator", "admin"]],
   ["/offline", "Queue", ["citizen", "operator", "admin"]],
   ["/dashboard", "Dashboard", ["operator", "admin"]],
+  ["/dashboard/reports", "Reports", ["operator", "admin"]],
   ["/analytics", "Analytics", ["operator", "admin"]],
   ["/admin", "Admin", ["admin"]]
 ];
