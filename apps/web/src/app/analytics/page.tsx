@@ -1,15 +1,18 @@
 import { AuthGuard } from "@/components/auth-guard";
 import { AppShell } from "@/components/shell";
 import { MetricCard, SectionHeader } from "@/components/ui";
-import { reports, summary } from "@/lib/demo-data";
+import { getFullSummary } from "@/lib/reports-repo";
 
-export default function AnalyticsPage() {
-  const data = summary();
+// Live per-request data (Supabase or demo); must not be statically cached.
+export const dynamic = "force-dynamic";
+
+export default async function AnalyticsPage() {
+  const data = await getFullSummary();
   const rows = [
-    ["No damage", reports.filter((report) => report.severity === "no_damage").length, "bg-radar-green"],
-    ["Minor", reports.filter((report) => report.severity === "minor_damage").length, "bg-radar-yellow"],
-    ["Major", reports.filter((report) => report.severity === "major_damage").length, "bg-radar-orange"],
-    ["Destroyed", reports.filter((report) => report.severity === "destroyed").length, "bg-radar-red"]
+    ["No damage", data.noDamage, "bg-radar-green"],
+    ["Minor", data.minorDamage, "bg-radar-yellow"],
+    ["Major", data.majorDamage, "bg-radar-orange"],
+    ["Destroyed", data.destroyed, "bg-radar-red"]
   ] as const;
   return (
     <AppShell>

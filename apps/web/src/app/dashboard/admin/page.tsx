@@ -1,7 +1,7 @@
 import { AuthGuard } from "@/components/auth-guard";
 import { AppShell } from "@/components/shell";
 import { RoleBadge, SectionHeader } from "@/components/ui";
-import { fullSummary } from "@/lib/demo-data";
+import { getFullSummary } from "@/lib/reports-repo";
 import {
   Activity,
   AlertOctagon,
@@ -16,8 +16,11 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
-export default function DashboardAdminPage() {
-  const stats = fullSummary();
+// Live per-request data (Supabase or demo); must not be statically cached.
+export const dynamic = "force-dynamic";
+
+export default async function DashboardAdminPage() {
+  const stats = await getFullSummary();
 
   return (
     <AppShell>

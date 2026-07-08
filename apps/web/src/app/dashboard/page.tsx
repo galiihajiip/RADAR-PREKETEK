@@ -2,11 +2,15 @@ import Link from "next/link";
 import { AuthGuard } from "@/components/auth-guard";
 import { AppShell } from "@/components/shell";
 import { MetricCard, SectionHeader, SeverityBadge } from "@/components/ui";
-import { fullSummary, reports } from "@/lib/demo-data";
+import { getFullSummary, getReports } from "@/lib/reports-repo";
 import { AlertTriangle, BarChart3, ClipboardList, FileText, Settings, Shield } from "lucide-react";
 
-export default function DashboardPage() {
-  const stats = fullSummary();
+// These pages read live per-request data (Supabase or demo), so they must
+// never be prerendered/cached as static HTML at build time.
+export const dynamic = "force-dynamic";
+
+export default async function DashboardPage() {
+  const [stats, reports] = await Promise.all([getFullSummary(), getReports({ limit: 250 })]);
   const latestReports = reports.slice(0, 12);
   const destroyedHighConf = reports.filter(
     (r) => r.severity === "destroyed" && r.confidence >= 0.85

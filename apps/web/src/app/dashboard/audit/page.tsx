@@ -2,7 +2,8 @@ import Link from "next/link";
 import { AuthGuard } from "@/components/auth-guard";
 import { AppShell } from "@/components/shell";
 import { EmptyState, SectionHeader } from "@/components/ui";
-import { generateAuditLog, type AuditEntry } from "@/lib/demo-data";
+import { getAuditLog } from "@/lib/reports-repo";
+import type { AuditEntry } from "@/lib/demo-data";
 import {
   CheckCircle2,
   FileText,
@@ -13,6 +14,9 @@ import {
   Siren,
   RefreshCw,
 } from "lucide-react";
+
+// Live per-request data (Supabase or demo); must not be statically cached.
+export const dynamic = "force-dynamic";
 
 const ACTION_ICONS: Record<string, React.ElementType> = {
   report_created: FileText,
@@ -60,8 +64,8 @@ function RolePill({ role }: { role: string }) {
   );
 }
 
-export default function DashboardAuditPage() {
-  const auditLog = generateAuditLog().slice(0, 150);
+export default async function DashboardAuditPage() {
+  const auditLog = (await getAuditLog()).slice(0, 150);
 
   if (auditLog.length === 0) {
     return (

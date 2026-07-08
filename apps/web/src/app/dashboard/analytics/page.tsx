@@ -2,11 +2,14 @@ import Link from "next/link";
 import { AuthGuard } from "@/components/auth-guard";
 import { AppShell } from "@/components/shell";
 import { MetricCard, SectionHeader } from "@/components/ui";
-import { fullSummary } from "@/lib/demo-data";
+import { getFullSummary } from "@/lib/reports-repo";
 import { Download, FileJson, FileSpreadsheet, Map, Shield } from "lucide-react";
 
-export default function DashboardAnalyticsPage() {
-  const s = fullSummary();
+// Live per-request data (Supabase or demo); must not be statically cached.
+export const dynamic = "force-dynamic";
+
+export default async function DashboardAnalyticsPage() {
+  const s = await getFullSummary();
 
   const severityRows: Array<[string, number, string]> = [
     ["Tidak Rusak", s.noDamage, "bg-radar-green"],
