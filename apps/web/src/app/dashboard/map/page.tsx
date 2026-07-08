@@ -13,7 +13,7 @@ const MapClient = dynamic(() => import("./map-client").then((mod) => mod.MapClie
 });
 
 export default function DashboardMapPage() {
-  const { reports, live } = useLiveReports();
+  const { reports, live } = useLiveReports({ limit: 120 });
 
   return (
     <AppShell>

@@ -20,6 +20,7 @@ export type ReportFilters = {
   severity?: Severity | "";
   status?: ReportStatus | "";
   minConfidence?: number | "";
+  limit?: number;
 };
 
 async function readResponse<T>(response: Response): Promise<T> {
@@ -56,6 +57,7 @@ export async function getReports(filters: ReportFilters = {}) {
   if (filters.minConfidence !== "" && filters.minConfidence !== undefined) {
     params.set("min_confidence", String(filters.minConfidence));
   }
+  if (filters.limit) params.set("limit", String(filters.limit));
   const response = await fetch(`/api/reports${params.toString() ? `?${params}` : ""}`, { cache: "no-store" });
   return readResponse<DamageReport[]>(response);
 }

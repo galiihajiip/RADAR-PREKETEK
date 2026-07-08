@@ -14,7 +14,7 @@ export function MapClient({ reports }: { reports: DamageReport[] }) {
 
   const filtered = useMemo(() => {
     const list = severityFilter ? reports.filter((report) => report.severity === severityFilter) : reports;
-    return list.slice(0, 500);
+    return list.slice(0, 150);
   }, [reports, severityFilter]);
 
   return (
@@ -87,7 +87,7 @@ export function MapClient({ reports }: { reports: DamageReport[] }) {
             ))}
           </div>
           <p className="mt-3 text-xs text-radar-muted">
-            Menampilkan maksimum 500 titik demo per filter agar peta tetap responsif.
+            Menampilkan maksimum 150 titik per filter agar peta tetap responsif.
           </p>
         </div>
       </aside>

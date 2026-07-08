@@ -8,7 +8,7 @@ import type { DamageReport, ReportStatus, Severity } from "@radar/shared";
 // and API route should go through this module instead of importing
 // demo-data or supabase-reports directly, so there's exactly one place
 // that decides which backend is live.
-function isDemoMode() {
+export function isDemoMode() {
   return process.env.DEMO_MODE !== "false";
 }
 

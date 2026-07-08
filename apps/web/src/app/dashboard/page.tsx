@@ -2,15 +2,16 @@ import Link from "next/link";
 import { AuthGuard } from "@/components/auth-guard";
 import { AppShell } from "@/components/shell";
 import { MetricCard, SectionHeader, SeverityBadge } from "@/components/ui";
-import { getFullSummary, getReports } from "@/lib/reports-repo";
-import { AlertTriangle, BarChart3, ClipboardList, FileText, Settings, Shield } from "lucide-react";
+import { getFullSummary, getReports, isDemoMode } from "@/lib/reports-repo";
+import { AlertTriangle, BarChart3, ClipboardList, FileText, Radio, Settings, Shield } from "lucide-react";
 
 // These pages read live per-request data (Supabase or demo), so they must
 // never be prerendered/cached as static HTML at build time.
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
-  const [stats, reports] = await Promise.all([getFullSummary(), getReports({ limit: 250 })]);
+  const [stats, reports] = await Promise.all([getFullSummary(), getReports({ limit: 40 })]);
+  const demo = isDemoMode();
   const latestReports = reports.slice(0, 12);
   const destroyedHighConf = reports.filter(
     (r) => r.severity === "destroyed" && r.confidence >= 0.85
@@ -25,10 +26,17 @@ export default async function DashboardPage() {
             title="Command Dashboard"
             description="Pusat kendali operasi penanggulangan bencana RADAR."
           />
-          <span className="inline-flex items-center gap-2 rounded-full bg-cyan-50 px-4 py-2 text-xs font-black text-radar-cyan">
-            <Shield className="h-4 w-4" aria-hidden />
-            RADAR Demo Mode
-          </span>
+          {demo ? (
+            <span className="inline-flex items-center gap-2 rounded-full bg-cyan-50 px-4 py-2 text-xs font-black text-radar-cyan">
+              <Shield className="h-4 w-4" aria-hidden />
+              RADAR Demo Mode
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-2 rounded-full bg-green-50 px-4 py-2 text-xs font-black text-radar-green">
+              <Radio className="h-4 w-4" aria-hidden />
+              Live (Supabase)
+            </span>
+          )}
         </div>
 
         {/* Critical escalation banner */}
@@ -216,12 +224,13 @@ export default async function DashboardPage() {
               </div>
             </div>
 
-            {/* Demo mode notice */}
+            {/* Mode notice */}
             <div className="rounded-xl border border-cyan-200 bg-cyan-50 p-4 text-sm">
-              <p className="font-black text-radar-navy">RADAR Demo Mode</p>
+              <p className="font-black text-radar-navy">{demo ? "RADAR Demo Mode" : "RADAR Live Mode"}</p>
               <p className="mt-1 text-radar-muted">
-                Data dan sebagian layanan menggunakan simulasi untuk kebutuhan MVP.
-                AI prediction menggunakan fallback deterministik.
+                {demo
+                  ? "Data dan sebagian layanan menggunakan simulasi untuk kebutuhan MVP. AI prediction menggunakan fallback deterministik."
+                  : "Data tersambung ke Supabase asli. Prediksi AI memakai model MobileNetV3-Small (proof-of-concept) dengan fallback otomatis kalau AI service tidak aktif."}
               </p>
             </div>
           </div>

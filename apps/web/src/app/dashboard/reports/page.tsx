@@ -20,7 +20,7 @@ function StatusBadge({ status }: { status: ReportStatus }) {
 
 export default function DashboardReportsPage() {
   const [reports, setReports] = useState<DamageReport[]>([]);
-  const [filters, setFilters] = useState<ReportFilters>({ q: "", severity: "", status: "", minConfidence: "" });
+  const [filters, setFilters] = useState<ReportFilters>({ q: "", severity: "", status: "", minConfidence: "", limit: 80 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 

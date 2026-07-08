@@ -68,7 +68,7 @@ export function LandingStatusBoard() {
 
   useEffect(() => {
     let active = true;
-    fetch("/api/reports?min_confidence=0.5", { cache: "no-store" })
+    fetch("/api/reports?min_confidence=0.5&limit=12", { cache: "no-store" })
       .then(async (response) => {
         const payload = (await response.json()) as ApiResponse<DamageReport[]>;
         if (!payload.success) throw new Error(payload.error.message);

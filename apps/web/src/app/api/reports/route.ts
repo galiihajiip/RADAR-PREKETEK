@@ -7,8 +7,10 @@ export async function GET(request: NextRequest) {
   const severity = (searchParams.get("severity") || undefined) as Severity | undefined;
   const status = (searchParams.get("status") || undefined) as ReportStatus | undefined;
   const min = searchParams.get("min_confidence");
+  const requestedLimit = Number(searchParams.get("limit") ?? 80);
+  const limit = Number.isFinite(requestedLimit) ? Math.min(Math.max(requestedLimit, 1), 250) : 80;
   const q = searchParams.get("q") ?? undefined;
-  const data = await getReports({ severity, status, minConfidence: min ? Number(min) : undefined, q });
+  const data = await getReports({ severity, status, minConfidence: min ? Number(min) : undefined, q, limit });
   return NextResponse.json({ success: true, data });
 }
 
