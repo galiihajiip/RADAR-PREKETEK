@@ -44,6 +44,7 @@ export default function ReportPage() {
   function payloadFromForm(form: HTMLFormElement): ReportPayload {
     const formData = new FormData(form);
     const image = formData.get("image");
+    const hasRealImage = image instanceof File && image.size > 0;
     const localId = `local-${Date.now()}`;
     return {
       localId,
@@ -53,8 +54,12 @@ export default function ReportPage() {
       description: String(formData.get("description") ?? ""),
       latitude: String(formData.get("latitude") ?? lat),
       longitude: String(formData.get("longitude") ?? lng),
-      imagePreview: image instanceof File && image.name ? `mock://${image.name}` : "/radar-mark.svg",
-      imageContentType: image instanceof File && image.type ? image.type : "image/mock"
+      // imageFile drives a real AI prediction on direct online submit; the
+      // mock preview is only used if this submission ends up in the offline
+      // queue instead (localStorage can't hold binary files).
+      imageFile: hasRealImage ? (image as File) : undefined,
+      imagePreview: hasRealImage ? `mock://${(image as File).name}` : "/radar-mark.svg",
+      imageContentType: hasRealImage ? (image as File).type : "image/mock"
     };
   }
 
@@ -69,8 +74,9 @@ export default function ReportPage() {
       const report = await createReport(payload);
       setCreated(report);
     } catch (error) {
-      const item = enqueueReport(payload);
-      localStorage.setItem("radar-last-report", JSON.stringify({ ...payload, localId: item.local_id, status: "offline_queued" }));
+      const { imageFile: _imageFile, ...queuablePayload } = payload;
+      const item = enqueueReport(queuablePayload);
+      localStorage.setItem("radar-last-report", JSON.stringify({ ...queuablePayload, localId: item.local_id, status: "offline_queued" }));
       setQueued(true);
       setSubmitError(error instanceof Error ? error.message : "API gagal. Laporan disimpan ke antrean lokal.");
     } finally {
@@ -86,13 +92,13 @@ export default function ReportPage() {
             <CheckCircle2 className="h-10 w-10 text-radar-green" />
             <h1 className="mt-4 text-3xl font-black text-radar-navy">Laporan berhasil dibuat</h1>
             <p className="mt-2 text-radar-muted">
-              Laporan masuk melalui API demo RADAR dan diproses dengan AI fallback lokal.
+              Laporan masuk dan diproses oleh layanan AI RADAR.
             </p>
             <div className="mt-5 grid gap-3 rounded-2xl bg-slate-50 p-4 text-sm">
               <p><span className="font-black">ID:</span> {created.id}</p>
               <p><span className="font-black">Status:</span> {created.status}</p>
               <p><span className="font-black">Prediksi AI:</span> {created.aiPrediction?.severity ?? created.severity} ({Math.round((created.aiPrediction?.confidence ?? created.confidence) * 100)}%)</p>
-              <p className="text-radar-muted">Catatan: upload biner foto belum aktif di Block 2; bukti foto memakai path/mock preview untuk menjaga demo tetap berjalan.</p>
+              <p className="text-radar-muted">Model: {created.aiPrediction?.modelVersion ?? "n/a"} — proof-of-concept, dilatih pada dataset terbatas (belum 4 kelas penuh).</p>
             </div>
             <div className="mt-6 flex flex-wrap gap-3">
               <Link className="btn-primary" href={`/dashboard/reports/${created.id}`}>Buka detail laporan</Link>
