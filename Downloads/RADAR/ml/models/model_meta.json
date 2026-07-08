@@ -1,0 +1,37 @@
+{
+  "model": "MobileNetV3-Small",
+  "status": "dataset-indexed-demo-fallback",
+  "classes": [
+    "no_damage",
+    "minor_damage",
+    "major_damage",
+    "destroyed"
+  ],
+  "available_train_classes": [
+    "no_damage",
+    "minor_damage",
+    "major_damage",
+    "destroyed"
+  ],
+  "counts": {
+    "train": {
+      "no_damage": 1750,
+      "minor_damage": 1802,
+      "major_damage": 1750,
+      "destroyed": 1755
+    },
+    "val": {
+      "no_damage": 375,
+      "minor_damage": 386,
+      "major_damage": 375,
+      "destroyed": 376
+    },
+    "test": {
+      "no_damage": 375,
+      "minor_damage": 387,
+      "major_damage": 375,
+      "destroyed": 377
+    }
+  },
+  "note": "Install torch/torchvision and add all four class folders before production training."
+}

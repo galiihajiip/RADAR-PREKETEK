@@ -1,0 +1,33 @@
+{
+  "name": "radar",
+  "version": "0.1.0",
+  "private": true,
+  "description": "RADAR - Rapid Artificial Intelligence Damage Assessment and Response",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "dev": "concurrently \"npm run dev:web\" \"npm run dev:ai\"",
+    "dev:web": "npm --workspace apps/web run dev",
+    "dev:ai": "cd apps/ai-service && flask --app app run --host 0.0.0.0 --port 5001",
+    "build:web": "npm --workspace apps/web run build",
+    "lint": "npm --workspace apps/web run lint",
+    "typecheck": "npm --workspace packages/shared run typecheck && npm --workspace apps/web run typecheck",
+    "test": "npm --workspace apps/web run test",
+    "test:ai": "cd apps/ai-service && python -m pytest -q",
+    "test:all": "npm run lint && npm run typecheck && npm run test && npm run test:ai",
+    "db:migrate": "node -e \"console.log('Run database/migrations in numeric order in Supabase SQL editor or Postgres.')\"",
+    "db:seed": "node -e \"console.log('Run database/seed/0001_demo_seed.sql after migrations.')\"",
+    "data:generate": "python ml/scripts/generate_dummy_data.py --reports 10000 --images-per-class 2500",
+    "ml:prepare": "python ml/scripts/prepare_dataset.py",
+    "ml:train": "python ml/scripts/train.py",
+    "ml:evaluate": "python ml/scripts/evaluate.py"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

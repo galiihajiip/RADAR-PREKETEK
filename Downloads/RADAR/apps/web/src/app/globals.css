@@ -1,0 +1,76 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --radar-navy: #0B1F3A;
+  --radar-blue: #0F4C81;
+  --radar-cyan: #00A8CC;
+  --radar-red: #D62828;
+  --radar-orange: #F77F00;
+  --radar-green: #2A9D8F;
+  --radar-yellow: #F4D35E;
+  --radar-bg: #F8FAFC;
+  --radar-text: #1E293B;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background:
+    linear-gradient(180deg, rgba(248, 250, 252, 0.96), rgba(239, 246, 249, 0.92)),
+    radial-gradient(circle at 18% 8%, rgba(0, 168, 204, 0.12), transparent 28%);
+  color: var(--radar-text);
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+.btn {
+  @apply inline-flex min-h-10 items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-bold transition focus:outline-none focus:ring-2 focus:ring-radar-cyan focus:ring-offset-2;
+}
+
+.btn-primary {
+  @apply btn bg-radar-navy text-white hover:bg-radar-blue;
+}
+
+.btn-danger {
+  @apply btn bg-radar-red text-white hover:brightness-95;
+}
+
+.btn-warning {
+  @apply btn bg-radar-orange text-white hover:brightness-95;
+}
+
+.btn-success {
+  @apply btn bg-radar-green text-white hover:brightness-95;
+}
+
+.panel {
+  @apply rounded-2xl border border-radar-border bg-white/95 p-5 shadow-soft;
+}
+
+.dark-surface {
+  @apply bg-radar-dark text-white;
+}
+
+.field {
+  @apply min-h-12 rounded-xl border border-radar-border bg-white px-3 py-2 text-sm outline-none transition focus:border-radar-cyan focus:ring-2 focus:ring-radar-cyan/20;
+}
+
+.map-grid {
+  background-image:
+    linear-gradient(rgba(15, 76, 129, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15, 76, 129, 0.08) 1px, transparent 1px),
+    radial-gradient(circle at 50% 50%, rgba(0, 168, 204, 0.16), transparent 34%),
+    linear-gradient(135deg, #eef8fa, #f8fafc);
+  background-size: 34px 34px, 34px 34px, auto, auto;
+}
+
+.glass-panel {
+  @apply border border-white/15 bg-white/10 shadow-soft backdrop-blur;
+}
