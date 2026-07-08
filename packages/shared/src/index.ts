@@ -59,17 +59,22 @@ export interface AiPrediction {
 export interface DamageReport {
   id: string;
   localId: string;
+  local_id?: string;
   reporterName: string;
   address: string;
   description: string;
   latitude: number;
   longitude: number;
   severity: Severity;
+  severityFinal?: Severity;
   status: ReportStatus;
   syncStatus: SyncStatus;
   confidence: number;
   createdAt: string;
   updatedAt: string;
+  validationNote?: string;
+  validatedAt?: string;
+  rejectedAt?: string;
   aiPrediction?: AiPrediction;
   image?: ReportImage;
 }
