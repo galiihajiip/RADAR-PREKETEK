@@ -10,10 +10,14 @@ export function GET() {
       properties: {
         id: report.id,
         address: report.address,
+        description: report.description,
         severity: report.severity,
+        severityFinal: report.severityFinal ?? report.severity,
         status: report.status,
-        confidence: report.confidence
-      }
-    }))
+        confidence: report.confidence,
+        reporterName: report.reporterName,
+        createdAt: report.createdAt,
+      },
+    })),
   });
 }
